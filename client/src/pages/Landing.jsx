@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import logo from "../assets/images/logo.svg";
 import students from "../assets/images/bg.svg";
 import Preloader from "../components/common/Preloader";
+import {Link} from "react-router-dom"
 
 const Landing = () => {
   const [isLoading, setIsLoading] = useState(true);
@@ -24,11 +25,9 @@ const Landing = () => {
           <div className="w-4/5 lg:w-3/5 bg-white rounded-lg shadow-lg flex flex-col md:flex-row overflow-hidden">
             <div className="w-full md:w-1/2 p-10 flex flex-col justify-between">
               <div className="mb-8">
-                <img
-                  src={logo}
-                  alt="Logo"
-                  className="h-14 mb-4"
-                />
+                <Link to="/">
+                  <img src={logo} alt="Logo" className="h-14 mb-4" />
+                </Link>
                 <h2 className="text-2xl font-bold text-gray-800">Paper Sync</h2>
                 <p className="text-gray-600">Exam Paper Management System</p>
               </div>
@@ -46,12 +45,17 @@ const Landing = () => {
               </div>
 
               <div className="mt-8 flex flex-col space-y-4">
-                <button className="bg-transparent text-blue-600 border border-blue-600 rounded-lg py-2 px-4 hover:bg-blue-600 hover:text-white">
-                  Already have an account
-                </button>
-                <button className="bg-blue-600 text-white rounded-lg py-2 px-4 hover:bg-blue-700">
-                  Sign up
-                </button>
+                <Link to="/sign-in">
+                  <button className="w-full bg-transparent text-blue-600 border border-blue-600 rounded-lg py-2 px-4 hover:bg-blue-600 hover:text-white">
+                    Already have an account
+                  </button>
+                </Link>
+
+                <Link to="/sign-up">
+                  <button className="w-full bg-blue-600 text-white rounded-lg py-2 px-4 hover:bg-blue-700">
+                    Sign up
+                  </button>
+                </Link>
               </div>
             </div>
 
