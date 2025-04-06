@@ -4,6 +4,9 @@ import LoginPage from "./pages/LoginPage";
 import AccountSetup from "./pages/AccountSetup";
 import RegistrationForm from "./pages/RegistrationForm";
 import ForgotPassword from "./pages/ForgotPassword";
+import Jayani from "./pages/jayani";
+
+
 function App() {
   
 
@@ -17,6 +20,7 @@ function App() {
           <Route path="/sign-up" element={<AccountSetup />} />
           <Route path="/register" element={<RegistrationForm />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/jayani" element={<Jayani />} />
           
         </Routes>
       </Router>
