@@ -1,27 +1,29 @@
-import Landing from "./pages/Landing"
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import React from "react";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
 import LoginPage from "./pages/LoginPage";
+import PaperSyncLogin from "./pages/PaperSyncLogin";
 import AccountSetup from "./pages/AccountSetup";
 import RegistrationForm from "./pages/RegistrationForm";
-import ForgotPassword from "./pages/ForgotPassword";
+
 function App() {
-  
-
   return (
-    <>
-      <Router>
+    <Router>
+      <div className="App">
         <Routes>
-
-          <Route path="/" element={<Landing />} />
-          <Route path="/sign-in" element={<LoginPage />} />
-          <Route path="/sign-up" element={<AccountSetup />} />
+          <Route path="/main" element={<PaperSyncLogin />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/signup" element={<AccountSetup />} />
           <Route path="/register" element={<RegistrationForm />} />
-          <Route path="/forgot-password" element={<ForgotPassword />} />
-          
+          <Route path="/" element={<Navigate to="/main" replace />} />
         </Routes>
-      </Router>
-    </>
+      </div>
+    </Router>
   );
 }
 
-export default App
+export default App;
