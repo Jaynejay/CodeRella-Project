@@ -1,3 +1,6 @@
+import bgImage from '../assets/images/bg.svg';
+import logoImage from '../assets/images/logo.svg';
+
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
@@ -21,7 +24,7 @@ const PaperSyncLogin = () => {
               {/* Logo and Department Header */}
               <div className="flex items-center mb-6">
                 <img 
-                  src="/logo.png" 
+                  src={logoImage} 
                   alt="DTET Logo" 
                   className="w-50 h-12 mr-3" 
                 />
@@ -62,7 +65,7 @@ const PaperSyncLogin = () => {
           {/* Right Panel - Graduation Image */}
           <div className="w-full md:w-7/12 bg-gray-100">
             <img 
-              src="/graduation.jpg" 
+              src={bgImage} 
               alt="Graduates throwing caps" 
               className="w-full h-full object-cover"
             />
