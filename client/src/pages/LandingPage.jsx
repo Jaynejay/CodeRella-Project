@@ -1,10 +1,10 @@
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import bgImage from '../assets/images/bg.svg';
 import logoImage from '../assets/images/logo.svg';
 
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 
-const PaperSyncLogin = () => {
+const LandingPage = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const navigate = useNavigate();
   
@@ -16,7 +16,7 @@ const PaperSyncLogin = () => {
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
-      <div className="w-full max-w-6xl bg-white rounded-lg shadow-lg overflow-hidden">
+      <div className="w-full max-w-4xl bg-white rounded-lg shadow-lg overflow-hidden">
         <div className="flex flex-col md:flex-row">
           {/* Left Panel */}
           <div className="w-full md:w-5/12 p-8 flex flex-col justify-between">
@@ -76,4 +76,4 @@ const PaperSyncLogin = () => {
   );
 };
 
-export default PaperSyncLogin;
+export default LandingPage;

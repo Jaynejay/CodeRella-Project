@@ -6,7 +6,7 @@ import {
   Navigate,
 } from "react-router-dom";
 import LoginPage from "./pages/LoginPage";
-import PaperSyncLogin from "./pages/PaperSyncLogin";
+import LandingPage from "./pages/LandingPage";
 import AccountSetup from "./pages/AccountSetup";
 import RegistrationForm from "./pages/RegistrationForm";
 
@@ -15,7 +15,7 @@ function App() {
     <Router>
       <div className="App">
         <Routes>
-          <Route path="/main" element={<PaperSyncLogin />} />
+          <Route path="/main" element={<LandingPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/signup" element={<AccountSetup />} />
           <Route path="/register" element={<RegistrationForm />} />
