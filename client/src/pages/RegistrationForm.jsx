@@ -1,81 +1,89 @@
-import { useState } from 'react';
+import { useState } from "react";
 import logo from "../assets/images/logo.svg";
 
 const RegistrationForm = () => {
-
   const [formData, setFormData] = useState({
-    firstName: '',
-    lastName: '',
-    dateOfBirth: '',
-    nic: '',
+    firstName: "",
+    lastName: "",
+    dateOfBirth: "",
+    nic: "",
     nicPhoto: null,
-    designation: '',
-    languages: [''],
-    phoneNumbers: [''],
-    email: '',
+    designation: "",
+    languages: [""],
+    phoneNumbers: [""],
+    email: "",
     address: {
-      homeNo: '',
-      street: '',
-      city: '',
-      district: ''
+      homeNo: "",
+      street: "",
+      city: "",
+      district: "",
     },
     bank: {
-      accountHolderName: '',
-      accountNumber: '',
-      bankName: '',
-      branch: '',
-      passbookPhoto: null
+      accountHolderName: "",
+      accountNumber: "",
+      bankName: "",
+      branch: "",
+      passbookPhoto: null,
     },
-    agreeTerms: false
+    agreeTerms: false,
   });
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
-    
-    if (name.includes('.')) {
-      const [parent, child] = name.split('.');
-      setFormData(prev => ({
+
+    if (name.includes(".")) {
+      const [parent, child] = name.split(".");
+      setFormData((prev) => ({
         ...prev,
         [parent]: {
           ...prev[parent],
-          [child]: value
-        }
+          [child]: value,
+        },
       }));
     } else {
-      setFormData(prev => ({
+      setFormData((prev) => ({
         ...prev,
-        [name]: type === 'checkbox' ? checked : value
+        [name]: type === "checkbox" ? checked : value,
       }));
     }
   };
 
   const handleFileChange = (e) => {
     const { name, files } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: files[0]
+      [name]: files[0],
     }));
   };
 
   const handleArrayChange = (index, field, value) => {
     const newArray = [...formData[field]];
     newArray[index] = value;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [field]: newArray
+      [field]: newArray,
     }));
   };
 
   const addField = (field) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [field]: [...prev[field], '']
+      [field]: [...prev[field], ""],
+    }));
+  };
+
+  const removeField = (field, index) => {
+    const newArray = [...formData[field]];
+    newArray.splice(index, 1);
+    setFormData((prev) => ({
+      ...prev,
+      [field]: newArray,
     }));
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log('Registration form submitted:', formData);
+    console.log("Registration form submitted:", formData);
     // Add your submission logic here
     // If successful, navigate to the next page
     // navigate('/success');
@@ -86,20 +94,17 @@ const RegistrationForm = () => {
       <div className="w-full max-w-5xl bg-white rounded-lg shadow-lg p-8">
         {/* Logo and Department Header */}
         <div className="flex items-center mb-6">
-          <img 
-            src={logo}
-            alt="DTET Logo" 
-            className="w-50 h-12 mr-3" 
-          />
-          
+          <img src={logo} alt="DTET Logo" className="w-50 h-12 mr-3" />
         </div>
 
-        <h1 className="text-xl font-bold mb-6">Please Fill out form to Register!</h1>
+        <h1 className="text-xl font-bold mb-6">
+          Please Fill out form to Register!
+        </h1>
 
         <form onSubmit={handleSubmit}>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
             {/* Left Column */}
-            <div>
+            <div className="py-5">
               {/* Personal Information */}
               <div className="mb-4">
                 <label className="block mb-1">First Name:</label>
@@ -149,7 +154,7 @@ const RegistrationForm = () => {
                 />
               </div>
 
-              <div className="mb-4">
+              <div className="mb-4 inline-flex">
                 <label className="block mb-1">Photo of NIC:</label>
                 <input
                   type="file"
@@ -158,13 +163,15 @@ const RegistrationForm = () => {
                   className="hidden"
                   id="nicPhoto"
                 />
-                <label 
-                  htmlFor="nicPhoto" 
+                <label
+                  htmlFor="nicPhoto"
                   className="bg-gray-200 hover:bg-gray-300 text-gray-800 py-1 px-4 rounded cursor-pointer text-sm"
                 >
                   upload file
                 </label>
-                {formData.nicPhoto && <span className="ml-2 text-sm">{formData.nicPhoto.name}</span>}
+                {formData.nicPhoto && (
+                  <span className="ml-2 text-sm">{formData.nicPhoto.name}</span>
+                )}
               </div>
 
               <div className="mb-4">
@@ -185,18 +192,59 @@ const RegistrationForm = () => {
                     <input
                       type="text"
                       value={language}
-                      onChange={(e) => handleArrayChange(index, 'languages', e.target.value)}
+                      onChange={(e) =>
+                        handleArrayChange(index, "languages", e.target.value)
+                      }
                       className="w-full border border-gray-300 rounded-md px-3 py-2"
                     />
-                    {index === formData.languages.length - 1 && (
-                      <button 
-                        type="button" 
-                        onClick={() => addField('languages')}
-                        className="ml-2 bg-white border border-gray-300 rounded-full w-6 h-6 flex items-center justify-center"
-                      >
-                        +
-                      </button>
-                    )}
+
+                    <div className="ml-2 flex gap-1">
+                      {formData.languages.length > 1 && (
+                        <button
+                          type="button"
+                          onClick={() => removeField("languages", index)}
+                          className="w-6 h-6 flex items-center justify-center text-red-500"
+                          title="Remove"
+                        >
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            strokeWidth={1.5}
+                            stroke="currentColor"
+                            className="size-6"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              d="M15 12H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
+                            />
+                          </svg>
+                        </button>
+                      )}
+                      {index === formData.languages.length - 1 && language.trim()!=="" &&(
+                        <button
+                          type="button"
+                          onClick={() => addField("languages")}
+                          className="ml-2 w-6 h-6 flex items-center justify-center"
+                        >
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            strokeWidth={1.5}
+                            stroke="currentColor"
+                            className="size-6"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
+                            />
+                          </svg>
+                        </button>
+                      )}
+                    </div>
                   </div>
                 ))}
               </div>
@@ -208,18 +256,59 @@ const RegistrationForm = () => {
                     <input
                       type="tel"
                       value={phone}
-                      onChange={(e) => handleArrayChange(index, 'phoneNumbers', e.target.value)}
+                      onChange={(e) =>
+                        handleArrayChange(index, "phoneNumbers", e.target.value)
+                      }
                       className="w-full border border-gray-300 rounded-md px-3 py-2"
                     />
-                    {index === formData.phoneNumbers.length - 1 && (
-                      <button 
-                        type="button" 
-                        onClick={() => addField('phoneNumbers')}
-                        className="ml-2 bg-white border border-gray-300 rounded-full w-6 h-6 flex items-center justify-center"
-                      >
-                        +
-                      </button>
-                    )}
+                    <div className="ml-2 flex gap-1">
+                      {formData.phoneNumbers.length > 1 && (
+                        <button
+                          type="button"
+                          onClick={() => removeField("phoneNumbers", index)}
+                          className="w-6 h-6 flex items-center justify-center text-red-500"
+                          title="Remove"
+                        >
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            strokeWidth={1.5}
+                            stroke="currentColor"
+                            className="size-6"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              d="M15 12H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
+                            />
+                          </svg>
+                        </button>
+                      )}
+
+                      {index === formData.phoneNumbers.length - 1 && phone.trim() !=="" &&(
+                        <button
+                          type="button"
+                          onClick={() => addField("phoneNumbers")}
+                          className="ml-2 flex items-center justify-center"
+                        >
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            strokeWidth={1.5}
+                            stroke="currentColor"
+                            className="size-6"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
+                            />
+                          </svg>
+                        </button>
+                      )}
+                    </div>
                   </div>
                 ))}
               </div>
@@ -239,8 +328,8 @@ const RegistrationForm = () => {
 
             {/* Right Column */}
             <div>
-              <div className="mb-4">
-                <label className="block mb-1">Address:</label>
+              <div>
+                <label className="block">Address:</label>
               </div>
 
               <div className="mb-4">
@@ -289,7 +378,9 @@ const RegistrationForm = () => {
               </div>
 
               <div className="mb-4">
-                <label className="block mb-1">Account holder&apos;s name:</label>
+                <label className="block mb-1">
+                  Account holder&apos;s name:
+                </label>
                 <input
                   type="text"
                   name="bank.accountHolderName"
@@ -332,37 +423,43 @@ const RegistrationForm = () => {
                 />
               </div>
 
-              <div className="mb-4">
-                <label className="block mb-1">Photo of first page of passbook:</label>
+              <div className="mb-4 inline-flex">
+                <label className="block mb-1">
+                  Photo of first page of passbook:
+                </label>
                 <input
                   type="file"
                   name="passbookPhoto"
                   onChange={(e) => {
                     const file = e.target.files[0];
-                    setFormData(prev => ({
+                    setFormData((prev) => ({
                       ...prev,
                       bank: {
                         ...prev.bank,
-                        passbookPhoto: file
-                      }
+                        passbookPhoto: file,
+                      },
                     }));
                   }}
                   className="hidden"
                   id="passbookPhoto"
                 />
-                <label 
-                  htmlFor="passbookPhoto" 
+                <label
+                  htmlFor="passbookPhoto"
                   className="bg-gray-200 hover:bg-gray-300 text-gray-800 py-1 px-4 rounded cursor-pointer text-sm"
                 >
                   upload file
                 </label>
-                {formData.bank.passbookPhoto && <span className="ml-2 text-sm">{formData.bank.passbookPhoto.name}</span>}
+                {formData.bank.passbookPhoto && (
+                  <span className="ml-2 text-sm">
+                    {formData.bank.passbookPhoto.name}
+                  </span>
+                )}
               </div>
             </div>
           </div>
 
           {/* Terms and Conditions */}
-          <div className="mt-6 flex items-center">
+          <div className="mt-1 flex items-center">
             <input
               type="checkbox"
               id="agreeTerms"
