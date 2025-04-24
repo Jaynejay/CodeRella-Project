@@ -33,8 +33,7 @@ const LandingPage = () => {
               
               {/* Main Content */}
               <div className="text-center mt-20 mb-8">
-                <h1 className="text-2xl font-bold">Paper Sync</h1>
-                <h2 className="text-xl font-bold">Exam Paper Management System</h2>
+                <h1 className="text-xl font-bold">Paper Sync Exam Paper Management System</h1>
                 <p className="text-lg font-medium mt-2">Welcome Back!</p>
               </div>
               
