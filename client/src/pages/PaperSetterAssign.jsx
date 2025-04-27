@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import Footer from "../components/Footer";
 import { Link } from "react-router-dom";
 import { useEffect } from "react";
 
@@ -28,7 +27,7 @@ const PaperSetterAssign = () => {
     };
 
     const handleSearch = (e) => {
-        comsole.log('Searching for:', e.target.value);
+        console.log('Searching for:', e.target.value);
         // Implement search logic here
     };
 
