@@ -112,7 +112,7 @@ const LoginPage = () => {
             <div className="mt-4 text-center">
               <p className="text-sm mb-2">Don&apos;t have an account?</p>
               <button
-                onClick={() => navigate("/sign-up")}
+                onClick={() => navigate("/account")}
                 className="w-full bg-white border border-blue-600 text-blue-600 py-2 px-4 rounded-md hover:bg-blue-50 transition duration-300"
               >
                 Sign up
