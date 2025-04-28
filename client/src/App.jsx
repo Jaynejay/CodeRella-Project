@@ -10,6 +10,7 @@ import LandingPage from "./pages/LandingPage";
 import AccountSetup from "./pages/AccountSetup";
 import RegistrationForm from "./pages/RegistrationForm";
 
+
 function App() {
   return (
     <Router>
