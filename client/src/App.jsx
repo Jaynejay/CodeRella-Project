@@ -10,9 +10,9 @@ import LandingPage from "./pages/LandingPage";
 import AccountSetup from "./pages/AccountSetup";
 import RegistrationForm from "./pages/RegistrationForm";
 import Forgotpw1 from "./pages/Forgotpw1";
-import Changepw1 from "./pages/Changepw1";
-
-
+import Changepw1 from "./pages/changepw1";
+import AdminDashboard from "./pages/AdminDashboard";
+import PaperSetterList from "./pages/PaperSetterList";
 
 function App() {
   return (
@@ -25,6 +25,10 @@ function App() {
           <Route path="/registration" element={<RegistrationForm />} />
           <Route path="/forgotpw" element={<Forgotpw1 />} />
           <Route path="/changepw" element={<Changepw1 />} />
+          <Route path="/admin" element={<AdminDashboard />} />
+          <Route path="/paperSetter" element={<PaperSetterList />} />
+
+          {/* Redirect from root to landing page */}
           <Route path="/" element={<Navigate to="/landing" replace />} />
         </Routes>
       </div>
