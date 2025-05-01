@@ -1,10 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import bgImage from '../assets/images/bg.svg';
-import logoImage from '../assets/images/logo.svg';
 
-
-const LandingPage = () => {
+const PaperSyncLogin = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const navigate = useNavigate();
   
@@ -16,7 +13,7 @@ const LandingPage = () => {
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
-      <div className="w-full max-w-4xl bg-white rounded-lg shadow-lg overflow-hidden">
+      <div className="w-full max-w-6xl bg-white rounded-lg shadow-lg overflow-hidden">
         <div className="flex flex-col md:flex-row">
           {/* Left Panel */}
           <div className="w-full md:w-5/12 p-8 flex flex-col justify-between">
@@ -24,7 +21,7 @@ const LandingPage = () => {
               {/* Logo and Department Header */}
               <div className="flex items-center mb-6">
                 <img 
-                  src={logoImage} 
+                  src="/logo.png" 
                   alt="DTET Logo" 
                   className="w-50 h-12 mr-3" 
                 />
@@ -33,7 +30,8 @@ const LandingPage = () => {
               
               {/* Main Content */}
               <div className="text-center mt-20 mb-8">
-                <h1 className="text-xl font-bold">Paper Sync Exam Paper Management System</h1>
+                <h1 className="text-2xl font-bold">Paper Sync</h1>
+                <h2 className="text-xl font-bold">Exam Paper Management System</h2>
                 <p className="text-lg font-medium mt-2">Welcome Back!</p>
               </div>
               
@@ -64,7 +62,7 @@ const LandingPage = () => {
           {/* Right Panel - Graduation Image */}
           <div className="w-full md:w-7/12 bg-gray-100">
             <img 
-              src={bgImage} 
+              src="/graduation.jpg" 
               alt="Graduates throwing caps" 
               className="w-full h-full object-cover"
             />
@@ -75,4 +73,4 @@ const LandingPage = () => {
   );
 };
 
-export default LandingPage;
+export default PaperSyncLogin;

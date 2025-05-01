@@ -9,6 +9,10 @@ import LoginPage from "./pages/LoginPage";
 import LandingPage from "./pages/LandingPage";
 import AccountSetup from "./pages/AccountSetup";
 import RegistrationForm from "./pages/RegistrationForm";
+import Forgotpw1 from "./pages/Forgotpw1";
+import Changepw1 from "./pages/changepw1";
+import AdminDashboard from "./pages/AdminDashboard";
+import PaperSetterList from "./pages/PaperSetterList";
 
 
 function App() {
@@ -16,11 +20,17 @@ function App() {
     <Router>
       <div className="App">
         <Routes>
-          <Route path="/main" element={<LandingPage />} />
+          <Route path="/landing" element={<LandingPage />} />
           <Route path="/login" element={<LoginPage />} />
-          <Route path="/signup" element={<AccountSetup />} />
-          <Route path="/register" element={<RegistrationForm />} />
-          <Route path="/" element={<Navigate to="/main" replace />} />
+          <Route path="/account" element={<AccountSetup />} />
+          <Route path="/registration" element={<RegistrationForm />} />
+          <Route path="/forgotpw" element={<Forgotpw1 />} />
+          <Route path="/changepw" element={<Changepw1 />} />
+          <Route path="/admin" element={<AdminDashboard />} />
+          <Route path="/paperSetter" element={<PaperSetterList />} />
+
+          {/* Redirect from root to landing page */}
+          <Route path="/" element={<Navigate to="/landing" replace />} />
         </Routes>
       </div>
     </Router>
