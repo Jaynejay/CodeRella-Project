@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+
 import logo from "../assets/images/logo.svg";
 import students from "../assets/images/bg.svg";
 
@@ -41,62 +42,64 @@ const LoginPage = () => {
               </div>
 
               {/* Login Form */}
-              <div className="mt-8 mb-8">
-                <h1 className="text-2xl font-bold mb-2">Paper Sync</h1>
-                <h2 className="text-xl font-medium mb-6">
-                  Exam Paper Management System
-                </h2>
-                <p className="text-lg font-medium mb-6">Welcome Back!</p>
+              <div className="text-center">
+                <div className="mt-8 mb-8">
+                  <h1 className="text-xl font-bold mb-2">
+                    Paper Sync Exam Paper Management System
+                  </h1>
 
-                <form onSubmit={handleSubmit}>
-                  <div className="mb-4">
-                    <label htmlFor="username" className="block text-left mb-1">
-                      Username:
-                    </label>
-                    <input
-                      type="text"
-                      id="username"
-                      name="username"
-                      value={loginData.username}
-                      onChange={handleChange}
-                      className="w-full border border-gray-300 rounded-md px-3 py-2"
-                      required
-                    />
-                  </div>
+                  <p className="text-lg font-medium mb-6">Welcome Back!</p>
 
-                  <div className="mb-4">
-                    <label htmlFor="password" className="block text-left mb-1">
-                      Password:
-                    </label>
-                    <input
-                      type="password"
-                      id="password"
-                      name="password"
-                      value={loginData.password}
-                      onChange={handleChange}
-                      className="w-full border border-gray-300 rounded-md px-3 py-2"
-                      required
-                    />
-                  </div>
+                  <form onSubmit={handleSubmit}>
+                    <div className="mb-4">
+                      <label htmlFor="username" className="block mb-1 text-left">
+                        Username:
+                      </label>
+                      <input
+                        type="text"
+                        id="username"
+                        name="username"
+                        value={loginData.username}
+                        onChange={handleChange}
+                        className="w-full border border-gray-300 rounded-md px-3 py-2"
+                        required
+                      />
+                    </div>
 
-                  <div className="flex justify-center">
-                    <button
-                      type="submit"
-                      className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition duration-300"
-                    >
-                      Login
-                    </button>
-                  </div>
+                    <div className="mb-4">
+                      <label htmlFor="password" className="block mb-1 text-left">
+                        Password:
+                      </label>
+                      <input
+                        type="password"
+                        id="password"
+                        name="password"
+                        value={loginData.password}
+                        onChange={handleChange}
+                        className="w-full border border-gray-300 rounded-md px-3 py-2"
+                        required
+                      />
+                    </div>
 
-                  <div className="text-center mt-4">
-                    <a
-                      href="/forgot-password"
-                      className="text-blue-600 hover:underline text-sm"
-                    >
-                      forgot password?
-                    </a>
-                  </div>
-                </form>
+                    <div className="flex justify-center">
+                      <button
+                        type="submit"
+                        className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition duration-300"
+                      >
+                        Login
+                      </button>
+                    </div>
+
+                    <div className="text-center mt-4">
+                      <a
+                        href="/forgot-password"
+                        className="text-blue-600 hover:underline text-sm"
+                      >
+                        forgot password?
+                      </a>
+                    </div>
+                  </form>
+                </div>
               </div>
             </div>
 
@@ -104,7 +107,7 @@ const LoginPage = () => {
             <div className="mt-4 text-center">
               <p className="text-sm mb-2">Don&apos;t have an account?</p>
               <button
-                onClick={() => navigate("/sign-up")}
+                onClick={() => navigate("/account")}
                 className="w-full bg-white border border-blue-600 text-blue-600 py-2 px-4 rounded-md hover:bg-blue-50 transition duration-300"
               >
                 Sign up
