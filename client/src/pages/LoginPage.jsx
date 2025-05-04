@@ -1,27 +1,28 @@
-import { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useState } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
+
 import logo from "../assets/images/logo.svg";
 import students from "../assets/images/bg.svg";
 
 const LoginPage = () => {
   const [loginData, setLoginData] = useState({
-    username: "",
-    password: "",
+    username: '',
+    password: ''
   });
   const navigate = useNavigate();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setLoginData((prevState) => ({
+    setLoginData(prevState => ({
       ...prevState,
-      [name]: value,
+      [name]: value
     }));
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
     // Add your login logic here
-    console.log("Login attempted:", loginData);
+    console.log('Login attempted:', loginData);
     // Example navigation after successful login
     // navigate('/dashboard');
   };
@@ -51,10 +52,7 @@ const LoginPage = () => {
 
                   <form onSubmit={handleSubmit}>
                     <div className="mb-4">
-                      <label
-                        htmlFor="username"
-                        className="block mb-1"
-                      >
+                      <label htmlFor="username" className="block mb-1 text-left">
                         Username:
                       </label>
                       <input
@@ -63,16 +61,13 @@ const LoginPage = () => {
                         name="username"
                         value={loginData.username}
                         onChange={handleChange}
-                        className="text-center w-full border border-gray-300 rounded-md px-3 py-2"
+                        className="w-full border border-gray-300 rounded-md px-3 py-2"
                         required
                       />
                     </div>
 
                     <div className="mb-4">
-                      <label
-                        htmlFor="password"
-                        className="block mb-1"
-                      >
+                      <label htmlFor="password" className="block mb-1 text-left">
                         Password:
                       </label>
                       <input
@@ -81,7 +76,7 @@ const LoginPage = () => {
                         name="password"
                         value={loginData.password}
                         onChange={handleChange}
-                        className="text-center w-full border border-gray-300 rounded-md px-3 py-2"
+                        className="w-full border border-gray-300 rounded-md px-3 py-2"
                         required
                       />
                     </div>

@@ -2,7 +2,16 @@
 export default {
   content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
   theme: {
-    extend: {},
+    extend: {borderRadius: {
+      'extra': '1.25rem',  // Add custom value here
+    }
+    
   },
-  plugins: [],
+  },
+  plugins: [
+    
+  ],
 };
+
+
+
