@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "163057353438",
+    "project_id": "coderella-95656",
+    "storage_bucket": "coderella-95656.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:163057353438:android:18063337782a733361b84f",
+        "android_client_info": {
+          "package_name": "com.example.mobile_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAbXkC3UXVCZ1YfbWUr1QHbOk5KOcgF0Rc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

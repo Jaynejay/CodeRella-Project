@@ -1,27 +1,20 @@
-import 'package:flutter/material.dart';
+ import 'package:flutter/material.dart';
+import 'login_page.dart';
 
-class LandingPage extends StatefulWidget {
+class LandingPage extends StatelessWidget {
   const LandingPage({super.key});
-
-  @override
-  State<LandingPage> createState() => _LandingPageState();
-}
-
-class _LandingPageState extends State<LandingPage> {
-  @override
-  void initState() {
-    super.initState();
-    // Navigate to login page after 2 seconds
-    Future.delayed(const Duration(seconds: 2), () {
-      Navigator.pushReplacementNamed(context, '/login');
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        color: const Color(0xFF0A3977),
+      backgroundColor: const Color(0xFF1B3B6F),
+      body: GestureDetector(
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const LoginPage()),
+          );
+        },
         child: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -30,28 +23,28 @@ class _LandingPageState extends State<LandingPage> {
                 'PAPER SYNC',
                 style: TextStyle(
                   color: Colors.white,
-                  fontSize: 32,
+                  fontSize: 40,
                   fontWeight: FontWeight.bold,
+                  fontFamily: 'serif',
                   letterSpacing: 2,
-                  fontFamily: 'Serif',
                 ),
               ),
               const SizedBox(height: 20),
               Stack(
-                alignment: Alignment.center,
+                alignment: Alignment.bottomRight,
                 children: [
                   Icon(
                     Icons.insert_drive_file_outlined,
                     size: 80,
-                    color: Colors.white.withOpacity(0.9),
+                    color: Colors.white.withAlpha(230),
                   ),
                   const Positioned(
-                    right: 12,
-                    bottom: 12,
+                    right: 0,
+                    bottom: 0,
                     child: Icon(
-                      Icons.verified_user,
-                      size: 24,
+                      Icons.person,
                       color: Colors.white,
+                      size: 24,
                     ),
                   ),
                 ],
@@ -62,4 +55,4 @@ class _LandingPageState extends State<LandingPage> {
       ),
     );
   }
-}
+} 
