@@ -48,11 +48,11 @@ const AccountSetup = () => {
 
               {/* Account Setup Form */}
               <div className="mt-8 mb-8">
-                <h1 className="text-2xl font-bold mb-8">
+                <h1 className="text-xl font-bold mb-8">
                   Set Up Your Account !
                 </h1>
 
-                <form onSubmit={handleSubmit}>
+                <form onSubmit={handleSubmit} className="text-center">
                   <div className="mb-4">
                     <label htmlFor="username" className="block mb-1">
                       Username:
@@ -63,7 +63,7 @@ const AccountSetup = () => {
                       name="username"
                       value={formData.username}
                       onChange={handleChange}
-                      className="w-full border border-gray-300 rounded-md px-3 py-2"
+                      className="text-center w-full border border-gray-300 rounded-md px-3 py-2"
                       required
                     />
                   </div>
@@ -78,7 +78,7 @@ const AccountSetup = () => {
                       name="password"
                       value={formData.password}
                       onChange={handleChange}
-                      className="w-full border border-gray-300 rounded-md px-3 py-2"
+                      className="text-center w-full border border-gray-300 rounded-md px-3 py-2"
                       required
                     />
                   </div>
@@ -93,7 +93,7 @@ const AccountSetup = () => {
                       name="confirmPassword"
                       value={formData.confirmPassword}
                       onChange={handleChange}
-                      className="w-full border border-gray-300 rounded-md px-3 py-2"
+                      className="text-center w-full border border-gray-300 rounded-md px-3 py-2"
                       required
                     />
                   </div>
