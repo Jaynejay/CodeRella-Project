@@ -34,13 +34,6 @@ const NavbarCourse = () => {
           >
             Courses
           </Link>
-
-          <Link
-              to="/payments"
-              className={`${location.pathname === '/payments' ? 'text-blue-600' : 'text-gray-800'} hover:text-blue-600 hover:border-b-2 hover:border-blue-600`}
-          >
-            Payments
-          </Link>
         </nav>
 
         {/* ✅ Updated icons section with notification dot and profile */}

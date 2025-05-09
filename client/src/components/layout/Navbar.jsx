@@ -51,7 +51,15 @@ const Navbar = () => {
             </li>
             <li className="mx-8">
               <Link 
-                to="/payments"
+                to="/users" 
+                className={`${location.pathname === '/users' ? 'text-blue-600' : 'text-gray-800'} hover:text-blue-600 hover:border-b-2 hover:border-blue-600`}
+              >
+                User Accounts
+              </Link>
+            </li>
+            <li className="mx-8">
+              <Link 
+                to="/payments" 
                 className={`${location.pathname === '/payments' ? 'text-blue-600' : 'text-gray-800'} hover:text-blue-600 hover:border-b-2 hover:border-blue-600`}
               >
                 Payments
