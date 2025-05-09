@@ -13,8 +13,7 @@ const Navbar = () => {
       <div className="max-w-7xl mx-auto px-10 py-2 flex items-center justify-between">
         <div className="flex items-center">
           <Link to="/dashboard">
-            <img 
-          
+            <img
                 src={logo} 
                 alt="DTET Logo" 
               className="h-12 mr-4"
