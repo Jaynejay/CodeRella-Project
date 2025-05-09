@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import { useState, useRef } from "react";
 import axios from "axios";
 import { UploadCloud } from "lucide-react";
 import { useNavigate } from "react-router-dom";
