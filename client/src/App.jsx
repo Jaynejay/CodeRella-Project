@@ -1,3 +1,4 @@
+
 // src/App.jsx
 import React from 'react';
 import {
@@ -39,12 +40,13 @@ import Changepw1          from './pages/changepw1';
 import AdminDashboard     from './pages/AdminDashboard';
 import PaperSetterList    from './pages/PaperSetterList';
 
+
+
 function App() {
   return (
     <div className="overflow-x-hidden">
       <Router>
         <Routes>
-
           {/* Redirect root → dashboard */}
           <Route path="/" element={<Navigate replace to="/dashboard" />} />
 
@@ -155,6 +157,8 @@ function App() {
           <Route path="/update-subject" element={<UpdateSubject />} />
           <Route path="/new-announcement" element={<NewAnnouncement />} />
 
+       
+         
         </Routes>
       </Router>
     </div>
