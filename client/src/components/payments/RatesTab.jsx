@@ -5,6 +5,7 @@ import toast from "react-hot-toast";
 import ConfirmDeleteModal from "../common/ConfirmDeleteModal";
 import RateFormModal from "./RateFormModal";
 import { useAdminRates, useDeleteRate } from "../../hooks/useAdminRates";
+import IconWithTooltip from "../common/IconWithTooltip";
 
 const RatesTab = () => {
   const { data: rates, isLoading, isError } = useAdminRates();
@@ -60,16 +61,21 @@ const RatesTab = () => {
                   <td className="py-2 px-3">Rs. {rate.rate}</td>
                   <td className="py-2 px-3 text-center">
                     <div className="flex justify-center gap-3">
-                      <Pencil
-                        className="text-blue-600 hover:text-blue-800 cursor-pointer"
-                        size={18}
-                        onClick={() => setFormData(rate)}
-                      />
-                      <Trash2
-                        className="text-red-600 hover:text-red-800 cursor-pointer"
-                        size={18}
-                        onClick={() => setDeleteTarget(rate)}
-                      />
+                      <IconWithTooltip label="Edit">
+                        <Pencil
+                          className="text-blue-600 hover:text-blue-800 cursor-pointer"
+                          size={18}
+                          onClick={() => setFormData(rate)}
+                        />
+                      </IconWithTooltip>
+
+                      <IconWithTooltip label="Delete">
+                        <Trash2
+                          className="text-red-600 hover:text-red-800 cursor-pointer"
+                          size={18}
+                          onClick={() => setDeleteTarget(rate)}
+                        />
+                      </IconWithTooltip>
                     </div>
                   </td>
                 </tr>
