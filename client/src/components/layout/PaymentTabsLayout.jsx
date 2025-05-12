@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import clsx from "clsx";
 import AccountTab from "../payments/AccountTab";
 import VoucherTab from "../payments/VoucherTab";

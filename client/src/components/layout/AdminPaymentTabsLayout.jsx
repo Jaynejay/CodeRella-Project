@@ -1,8 +1,8 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { Banknote, FileText, BarChart, ArrowLeft } from "lucide-react";
-import RatesTab from "../payments/RatesTab"; // to be created
-import VoucherAdminTab from "../payments/VoucherAdminTab"; // next step
-//import StatusTab from "../admin/StatusTab"; // later step
+import RatesTab from "../payments/RatesTab"; 
+import VoucherAdminTab from "../payments/VoucherAdminTab"; 
+import StatusTab from "../payments/PaymentStatusAdminTab";
 import clsx from "clsx";
 import { useNavigate } from "react-router-dom";
 
@@ -17,7 +17,7 @@ const AdminPaymentTabsLayout = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="flex min-h-screen bg-gray-100">
+    <div className="flex min-h-screen bg-gray-100 pt-24 sticky">
       {/* Sidebar */}
       <aside className="w-64 bg-white shadow-lg p-6 flex flex-col justify-between rounded-r-2xl">
         <div>

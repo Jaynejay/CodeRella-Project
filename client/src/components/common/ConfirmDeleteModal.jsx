@@ -1,4 +1,3 @@
-import React from "react";
 
 const ConfirmDeleteModal = ({ title, description, onConfirm, onCancel }) => {
   return (
