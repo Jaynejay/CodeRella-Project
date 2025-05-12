@@ -45,7 +45,7 @@ const AdminPaymentTabsLayout = () => {
         <div className="pt-6 border-t">
           <button
             className="flex items-center gap-2 text-sm text-gray-600 hover:text-black transition"
-            onClick={() => navigate("/dashboard")}
+            onClick={() => navigate("/admin/dashboard")}
           >
             <ArrowLeft size={16} />
             Back to Dashboard
