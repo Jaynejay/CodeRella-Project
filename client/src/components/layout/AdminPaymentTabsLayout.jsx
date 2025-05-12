@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Banknote, FileText, BarChart, ArrowLeft } from "lucide-react";
 import RatesTab from "../payments/RatesTab"; // to be created
-//import VoucherAdminTab from "../admin/VoucherAdminTab"; // next step
+import VoucherAdminTab from "../payments/VoucherAdminTab"; // next step
 //import StatusTab from "../admin/StatusTab"; // later step
 import clsx from "clsx";
 import { useNavigate } from "react-router-dom";
