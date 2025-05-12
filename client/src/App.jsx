@@ -42,6 +42,7 @@ import PaperSetterList    from './pages/PaperSetterList';
 
 // payment imports
 import PaymentPage from './pages/payments/PaymentPage.jsx'
+import AdminRatesPage from './pages/payments/AdminRatesPage.jsx';
 
 
 
@@ -163,6 +164,9 @@ function App() {
                     {/* Payment routes */}
 
                     <Route path="/payments" element={<PaymentPage />} />
+                    <Route path="/admin/payments" element={<AdminRatesPage />} />
+
+                   
 
 
 
