@@ -7,6 +7,7 @@ import ConfirmActionModal from "../common/ConfirmActionModal";
 import VoucherDetailModal from "./VoucherDetailModal";
 import IconWithTooltip from "../common/IconWithTooltip";
 import SearchBar from "../common/SearchBar";
+import DateRangePicker from "../common/DateRangePicker";
 
 import {
   useAdminVouchers,
@@ -29,6 +30,8 @@ const VoucherAdminTab = () => {
   const [actionType, setActionType] = useState(null);
   const [page, setPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
 
   const handleApprove = (id) => {
     approveMutation.mutate(id, {
@@ -52,14 +55,20 @@ const VoucherAdminTab = () => {
   };
 
   const filteredData =
-    data?.filter(
-      (v) =>
+    data?.filter((v) => {
+      const matchesSearch =
         v.voucherNo.toLowerCase().includes(searchTerm.toLowerCase()) ||
         v.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         v.course.toLowerCase().includes(searchTerm.toLowerCase()) ||
         v.subject.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        v.status.toLowerCase().includes(searchTerm.toLowerCase())
-    ) || [];
+        v.status.toLowerCase().includes(searchTerm.toLowerCase());
+
+      const itemDate = new Date(v.submittedAt);
+      const afterStart = startDate ? itemDate >= new Date(startDate) : true;
+      const beforeEnd = endDate ? itemDate <= new Date(endDate) : true;
+
+      return matchesSearch && afterStart && beforeEnd;
+    }) || [];
 
   const paginatedData = filteredData.slice(
     (page - 1) * ITEMS_PER_PAGE,
@@ -80,10 +89,20 @@ const VoucherAdminTab = () => {
         <p className="text-red-600">Failed to load vouchers.</p>
       ) : (
         <>
-          <SearchBar
-            placeholder="Search vouchers..."
-            onSearch={setSearchTerm}
-          />
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <SearchBar
+              placeholder="Search vouchers..."
+              onSearch={setSearchTerm}
+            />
+
+            <div className="pl-24">Filter by date:</div>
+            <DateRangePicker
+              startDate={startDate}
+              endDate={endDate}
+              setStartDate={setStartDate}
+              setEndDate={setEndDate}
+            />
+          </div>
 
           <div className="overflow-x-auto">
             <table className="w-full text-sm border-t">

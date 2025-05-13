@@ -3,6 +3,7 @@ import { Pencil, Trash2, Plus } from "lucide-react";
 import Skeleton from "react-loading-skeleton";
 import toast from "react-hot-toast";
 import SearchBar from "../common/SearchBar";
+import DateRangePicker from "../common/DateRangePicker";
 import ConfirmDeleteModal from "../common/ConfirmDeleteModal";
 import IconWithTooltip from "../common/IconWithTooltip";
 import StatusFormModal from "./StatusFormModal";
@@ -17,6 +18,8 @@ const StatusTab = () => {
   const [page, setPage] = useState(1);
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [formData, setFormData] = useState(null);
+  const [startDate, setStartDate] = useState(null);
+  const [endDate, setEndDate] = useState(null);
 
   const handleDelete = (id) => {
     deleteMutation.mutate(id, {
@@ -26,12 +29,26 @@ const StatusTab = () => {
   };
 
   const filteredData =
-    statuses?.filter((s) =>
-      [s.voucherNo, s.userId, s.username, s.status, s.amount, s.date]
+    statuses?.filter((s) => {
+      const matchesSearch = [
+        s.voucherNo,
+        s.userId,
+        s.username,
+        s.status,
+        s.amount,
+        s.date,
+      ]
         .join(" ")
         .toLowerCase()
-        .includes(searchTerm.toLowerCase())
-    ) || [];
+        .includes(searchTerm.toLowerCase());
+
+      const recordDate = new Date(s.date);
+      const withinDateRange =
+        (!startDate || recordDate >= new Date(startDate)) &&
+        (!endDate || recordDate <= new Date(endDate));
+
+      return matchesSearch && withinDateRange;
+    }) || [];
 
   const paginated = filteredData.slice(
     (page - 1) * ITEMS_PER_PAGE,
@@ -60,7 +77,20 @@ const StatusTab = () => {
         <p className="text-red-600">Failed to load statuses.</p>
       ) : (
         <>
-          <SearchBar placeholder="Search status..." onSearch={setSearchTerm} />
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <SearchBar
+              placeholder="Search payments"
+              onSearch={setSearchTerm}
+            />
+
+            <div className="pl-24">Filter by date:</div>
+            <DateRangePicker
+              startDate={startDate}
+              endDate={endDate}
+              setStartDate={setStartDate}
+              setEndDate={setEndDate}
+            />
+          </div>
 
           <div className="overflow-x-auto">
             <table className="w-full text-sm border-t">
