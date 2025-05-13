@@ -2,6 +2,7 @@ package com.example.coderella.service.impl;
 
 import com.example.coderella.dto.PaymentRateRequest;
 import com.example.coderella.dto.PaymentRateResponse;
+import com.example.coderella.dto.PaymentStatusResponse;
 import com.example.coderella.entity.PaymentRate;
 import com.example.coderella.repository.PaymentRateRepository;
 import com.example.coderella.service.PaymentRateService;
@@ -53,6 +54,7 @@ public class PaymentRateServiceImpl implements PaymentRateService {
         }
         repository.deleteById(id);
     }
+
 
     @Override
     public List<PaymentRateResponse> getAllRates() {

@@ -96,7 +96,7 @@ public class VoucherServiceImpl implements VoucherService {
         System.out.println("[NOTIFY] " + updated.getSubmittedBy() +
                 " — Your voucher " + updated.getVoucherNumber() + " has been APPROVED.");
 
-        // ✅ Send FCM notification
+        
         notificationService.sendNotification(
             "USER_FCM_TOKEN_HERE", //Replace this with actual token (e.g., from user table)
             "Voucher Approved",
