@@ -2,100 +2,131 @@ import api from "./api";
 
 // Fake in-memory submitted vouchers
 let submittedVouchers = [
-    {
-        registrationId: "REG123",
-        examName: "Final Exam",
-        courseCode: "C101",
-        subjectCode: "S201",
-        message: "Urgent request for voucher.",
-        status: "Pending",
-    },
-    {
-        registrationId: "REG456",
-        examName: "Midterm",
-        courseCode: "C102",
-        subjectCode: "S202",
-        message: "Submitted late.",
-        status: "Approved",
-    },
+  {
+    registrationId: "REG123",
+    examName: "Final Exam",
+    courseCode: "C101",
+    subjectCode: "S201",
+    message: "Urgent request for voucher.",
+    status: "Pending",
+    submittedAt: "2024-12-01",
+  },
+  {
+    registrationId: "REG456",
+    examName: "Midterm",
+    courseCode: "C102",
+    subjectCode: "S202",
+    message: "Submitted late.",
+    status: "Approved",
+    submittedAt: "2024-11-20",
+  },
 ];
 
 // Dummy payment rates
 const paymentRates = [
-    {
-        courseCode: "C101",
-        subjectCode: "S201",
-        duration: "2",
-        rate: "Rs. 2500",
-        note: "Standard rate for 2-hour paper",
-    },
-    {
-        courseCode: "C101",
-        subjectCode: "S201",
-        duration: "3",
-        rate: "Rs. 3000",
-        note: "Extended paper rate",
-    },
-    {
-        courseCode: "C102",
-        subjectCode: "S202",
-        duration: "2",
-        rate: "Rs. 2800",
-        note: "Practical module rate",
-    },
+  {
+    courseCode: "C101",
+    subjectCode: "S201",
+    duration: "2",
+    rate: "Rs. 2500",
+    note: "Standard rate for 2-hour paper",
+  },
+  {
+    courseCode: "C101",
+    subjectCode: "S201",
+    duration: "3",
+    rate: "Rs. 3000",
+    note: "Extended paper rate",
+  },
+  {
+    courseCode: "C102",
+    subjectCode: "S202",
+    duration: "2",
+    rate: "Rs. 2800",
+    note: "Practical module rate",
+  },
 ];
 
 // GET submitted vouchers
 export const getVoucherData = async () => {
-    try {
-        // const response = await api.get("/user/vouchers");
-        // return response.data;
+  try {
+    // const response = await api.get("/user/vouchers");
+    // return response.data;
 
-        return new Promise((resolve) =>
-            setTimeout(() => resolve(submittedVouchers), 800)
-        );
-    } catch (error) {
-        const message =
-            error.response?.data?.message || "Failed to load voucher data.";
-        throw new Error(message);
-    }
+    return new Promise((resolve) =>
+      setTimeout(() => resolve(submittedVouchers), 800)
+    );
+  } catch (error) {
+    const message =
+      error.response?.data?.message || "Failed to load voucher data.";
+    throw new Error(message);
+  }
 };
 
 // POST new voucher
 export const submitVoucher = async (payload) => {
-    try {
-        // const response = await api.post("/user/vouchers", payload);
-        // return response.data;
+  try {
+    // const response = await api.post("/user/vouchers", payload);
+    // return response.data;
 
-        const newVoucher = { ...payload, status: "Pending" };
-        submittedVouchers.push(newVoucher);
+    const newVoucher = {
+      ...payload,
+      status: "Pending",
+      submittedAt: new Date().toISOString().split("T")[0],
+    };
+    submittedVouchers.push(newVoucher);
 
-        return new Promise((resolve) =>
-            setTimeout(() => resolve({ success: true }), 500)
-        );
-    } catch (error) {
-        const message =
-            error.response?.data?.message || "Failed to submit voucher.";
-        throw new Error(message);
-    }
+    return new Promise((resolve) =>
+      setTimeout(() => resolve({ success: true }), 500)
+    );
+  } catch (error) {
+    const message =
+      error.response?.data?.message || "Failed to submit voucher.";
+    throw new Error(message);
+  }
 };
 
 // GET payment rate by course, subject, duration
 export const getPaymentRate = async ({ courseCode, subjectCode, duration }) => {
-    try {
-        const matched = paymentRates.find(
-            (rate) =>
-                rate.courseCode === courseCode &&
-                rate.subjectCode === subjectCode &&
-                rate.duration === duration
-        );
+  try {
+    const matched = paymentRates.find(
+      (rate) =>
+        rate.courseCode === courseCode &&
+        rate.subjectCode === subjectCode &&
+        rate.duration === duration
+    );
 
-        return new Promise((resolve) =>
-            setTimeout(() => resolve(matched || null), 600)
-        );
-    } catch (error) {
-        const message =
-            error.response?.data?.message || "Failed to fetch payment rate.";
-        throw new Error(message);
-    }
+    return new Promise((resolve) =>
+      setTimeout(() => resolve(matched || null), 600)
+    );
+  } catch (error) {
+    const message =
+      error.response?.data?.message || "Failed to fetch payment rate.";
+    throw new Error(message);
+  }
+};
+
+// GET available course/subject/duration options
+export const getRateOptions = async () => {
+  try {
+    const courseCodes = [...new Set(paymentRates.map((r) => r.courseCode))];
+    const subjectCodes = [...new Set(paymentRates.map((r) => r.subjectCode))];
+    const durations = [...new Set(paymentRates.map((r) => r.duration))];
+
+    return new Promise((resolve) =>
+      setTimeout(
+        () =>
+          resolve({
+            courseCodes,
+            subjectCodes,
+            durations,
+          }),
+        300
+      )
+    );
+  } catch (error) {
+    const message =
+      error.response?.data?.message || "Failed to load rate options.";
+    throw new Error(message);
+  }
 };

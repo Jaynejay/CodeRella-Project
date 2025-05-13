@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Skeleton from "react-loading-skeleton";
@@ -10,18 +10,22 @@ import {
   useVoucherSubmit,
   usePaymentRateSearch,
 } from "../../hooks/useVoucher";
+import { getRateOptions } from "../../services/voucherService";
 
 const ITEMS_PER_PAGE = 5;
 
 const VoucherTab = () => {
-  // State for pagination
   const [page, setPage] = useState(1);
-
-  // State for payment rate search
+  const [searchTerm, setSearchTerm] = useState("");
   const [rateForm, setRateForm] = useState({
     courseCode: "",
     subjectCode: "",
     duration: "",
+  });
+  const [rateOptions, setRateOptions] = useState({
+    courseCodes: [],
+    subjectCodes: [],
+    durations: [],
   });
 
   const paymentRateMutation = usePaymentRateSearch();
@@ -32,7 +36,6 @@ const VoucherTab = () => {
   } = useVoucherData();
   const submitMutation = useVoucherSubmit();
 
-  // react-hook-form
   const {
     register,
     handleSubmit,
@@ -41,6 +44,10 @@ const VoucherTab = () => {
   } = useForm({
     resolver: zodResolver(voucherSchema),
   });
+
+  useEffect(() => {
+    getRateOptions().then(setRateOptions);
+  }, []);
 
   const onSubmit = (data) => {
     submitMutation.mutate(data, {
@@ -62,9 +69,15 @@ const VoucherTab = () => {
     paymentRateMutation.mutate(rateForm);
   };
 
-  // Paginated voucher list
-  const totalPages = Math.ceil((vouchers?.length || 0) / ITEMS_PER_PAGE);
-  const paginatedVouchers = vouchers?.slice(
+  const filteredVouchers = vouchers?.filter((v) =>
+    [v.registrationId, v.examName, v.courseCode, v.subjectCode, v.status]
+      .join(" ")
+      .toLowerCase()
+      .includes(searchTerm.toLowerCase())
+  ) || [];
+
+  const totalPages = Math.ceil(filteredVouchers.length / ITEMS_PER_PAGE);
+  const paginatedVouchers = filteredVouchers.slice(
     (page - 1) * ITEMS_PER_PAGE,
     page * ITEMS_PER_PAGE
   );
@@ -86,8 +99,9 @@ const VoucherTab = () => {
               className="w-full p-2 border border-gray-300 rounded-md"
             >
               <option value="">Select Course Code</option>
-              <option value="C101">C101</option>
-              <option value="C102">C102</option>
+              {rateOptions.courseCodes.map((c) => (
+                <option key={c} value={c}>{c}</option>
+              ))}
             </select>
 
             <select
@@ -98,8 +112,9 @@ const VoucherTab = () => {
               className="w-full p-2 border border-gray-300 rounded-md"
             >
               <option value="">Select Subject Code</option>
-              <option value="S201">S201</option>
-              <option value="S202">S202</option>
+              {rateOptions.subjectCodes.map((s) => (
+                <option key={s} value={s}>{s}</option>
+              ))}
             </select>
 
             <select
@@ -110,8 +125,9 @@ const VoucherTab = () => {
               className="w-full p-2 border border-gray-300 rounded-md"
             >
               <option value="">Select Paper Duration</option>
-              <option value="2">2 hours</option>
-              <option value="3">3 hours</option>
+              {rateOptions.durations.map((d) => (
+                <option key={d} value={d}>{d} hours</option>
+              ))}
             </select>
 
             <button
@@ -122,7 +138,6 @@ const VoucherTab = () => {
             </button>
           </div>
 
-          {/* Rate Result */}
           {paymentRateMutation.isPending ? (
             <Skeleton height={70} />
           ) : paymentRateMutation.data ? (
@@ -216,14 +231,22 @@ const VoucherTab = () => {
 
       {/* Submitted Vouchers */}
       <div className="bg-white shadow rounded-2xl p-6">
-        <h2 className="text-lg font-semibold mb-4">
-          Submitted Voucher Requests
-        </h2>
+        <h2 className="text-lg font-semibold mb-4">Submitted Voucher Requests</h2>
+
+        <input
+          type="text"
+          placeholder="Search vouchers..."
+          className="w-full mb-4 p-2 border rounded"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
 
         {isVouchersLoading ? (
           <Skeleton count={5} height={20} />
         ) : isError ? (
           <p className="text-red-600">Failed to load voucher data.</p>
+        ) : filteredVouchers.length === 0 ? (
+          <p className="text-gray-500">No result found.</p>
         ) : (
           <>
             <div className="overflow-x-auto">
@@ -234,6 +257,7 @@ const VoucherTab = () => {
                     <th className="py-2 px-3">Exam</th>
                     <th className="py-2 px-3">Course</th>
                     <th className="py-2 px-3">Subject</th>
+                    <th className="py-2 px-3">Date</th>
                     <th className="py-2 px-3">Status</th>
                   </tr>
                 </thead>
@@ -244,6 +268,7 @@ const VoucherTab = () => {
                       <td className="py-2 px-3">{v.examName}</td>
                       <td className="py-2 px-3">{v.courseCode}</td>
                       <td className="py-2 px-3">{v.subjectCode}</td>
+                      <td className="py-2 px-3">{v.submittedAt}</td>
                       <td className="py-2 px-3">
                         <span
                           className={`px-2 py-1 rounded-full text-xs font-medium ${
@@ -263,7 +288,6 @@ const VoucherTab = () => {
               </table>
             </div>
 
-            {/* Pagination */}
             <div className="flex justify-end gap-3 mt-4">
               <button
                 className="px-3 py-1 text-sm rounded bg-gray-200 hover:bg-gray-300 disabled:opacity-50"
