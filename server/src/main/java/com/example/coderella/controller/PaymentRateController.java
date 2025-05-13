@@ -68,4 +68,55 @@ public class PaymentRateController {
                         .build()
         );
     }
+
+    @GetMapping("/search")
+    public ResponseEntity<ApiResponse<PaymentRateResponse>> searchRate(
+        @RequestParam String courseCode,
+        @RequestParam String subjectCode,
+        @RequestParam Integer duration) {
+
+    PaymentRateResponse result = paymentRateService.findRateBySearch(courseCode, subjectCode, duration);
+    return ResponseEntity.ok(
+            ApiResponse.<PaymentRateResponse>builder()
+                    .status(200)
+                    .message("Rate fetched successfully")
+                    .data(result)
+                    .build()
+    );
+}
+
+    @GetMapping("/course-codes")
+    public ResponseEntity<ApiResponse<List<String>>> getCourseCodes() {
+        return ResponseEntity.ok(
+                ApiResponse.<List<String>>builder()
+                        .status(200)
+                        .message("Course codes fetched successfully")
+                        .data(paymentRateService.getDistinctCourseCodes())
+                        .build()
+        );
+    }
+
+    @GetMapping("/subject-codes")
+    public ResponseEntity<ApiResponse<List<String>>> getSubjectCodes() {
+        return ResponseEntity.ok(
+                ApiResponse.<List<String>>builder()
+                        .status(200)
+                        .message("Subject codes fetched successfully")
+                        .data(paymentRateService.getDistinctSubjectCodes())
+                        .build()
+        );
+    }
+
+    @GetMapping("/durations")
+    public ResponseEntity<ApiResponse<List<Integer>>> getDurations() {
+        return ResponseEntity.ok(
+                ApiResponse.<List<Integer>>builder()
+                        .status(200)
+                        .message("Durations fetched successfully")
+                        .data(paymentRateService.getDistinctDurations())
+                        .build()
+        );
+    }
+
+
 }

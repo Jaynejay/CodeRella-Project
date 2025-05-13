@@ -10,4 +10,12 @@ public interface PaymentRateService {
     PaymentRateResponse updateRate(Long id, PaymentRateRequest request);
     void deleteRate(Long id);
     List<PaymentRateResponse> getAllRates();
+
+    PaymentRateResponse findRateBySearch(String courseCode, String subjectCode, Integer duration);
+
+    List<String> getDistinctCourseCodes();
+    List<String> getDistinctSubjectCodes();
+    List<Integer> getDistinctDurations();
+
+
 }

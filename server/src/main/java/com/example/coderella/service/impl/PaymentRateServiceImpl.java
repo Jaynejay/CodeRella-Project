@@ -83,4 +83,28 @@ public class PaymentRateServiceImpl implements PaymentRateService {
                 .rate(entity.getRate())
                 .build();
     }
+
+    @Override
+    public PaymentRateResponse findRateBySearch(String courseCode, String subjectCode, Integer duration) {
+    PaymentRate rate = repository.findByCourseCodeAndSubjectCodeAndDuration(courseCode, subjectCode, duration)
+            .orElseThrow(() -> new EntityNotFoundException("No rate found for the selected criteria"));
+    return mapToResponse(rate);
+}
+
+    @Override
+    public List<String> getDistinctCourseCodes() {
+        return repository.findDistinctCourseCodes();
+    }
+
+    @Override
+    public List<String> getDistinctSubjectCodes() {
+        return repository.findDistinctSubjectCodes();
+    }
+
+    @Override
+    public List<Integer> getDistinctDurations() {
+        return repository.findDistinctDurations();
+    }
+
+
 }
