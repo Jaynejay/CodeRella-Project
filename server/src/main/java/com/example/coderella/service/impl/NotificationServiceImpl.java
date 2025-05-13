@@ -11,6 +11,11 @@ public class NotificationServiceImpl implements NotificationService {
 
     @Override
     public void sendNotification(String userToken, String title, String messageText) {
+        if (userToken == null || userToken.isBlank()) {
+            System.err.println("❌ FCM token is missing — skipping notification.");
+            return;
+        }
+
         try {
             Message message = Message.builder()
                     .setToken(userToken)
@@ -24,8 +29,7 @@ public class NotificationServiceImpl implements NotificationService {
             System.out.println("✅ FCM Notification sent. Response: " + response);
 
         } catch (Exception e) {
-            System.err.println("❌ Failed to send notification: " + e.getMessage());
-            // Do not throw to avoid breaking business logic
+            System.err.println("❌ FCM notification failed: " + e.getClass().getSimpleName() + " — " + e.getMessage());
         }
     }
 }
