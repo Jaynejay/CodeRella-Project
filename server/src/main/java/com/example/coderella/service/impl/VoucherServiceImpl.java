@@ -4,12 +4,14 @@ import com.example.coderella.dto.VoucherRequest;
 import com.example.coderella.dto.VoucherResponse;
 import com.example.coderella.entity.Voucher;
 import com.example.coderella.repository.VoucherRepository;
+import com.example.coderella.service.NotificationService;
 import com.example.coderella.service.VoucherService;
 import com.example.coderella.util.VoucherUtils;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -19,6 +21,7 @@ import java.util.stream.Collectors;
 public class VoucherServiceImpl implements VoucherService {
 
     private final VoucherRepository repository;
+    private final NotificationService notificationService;
 
     @Override
     @Transactional
@@ -92,6 +95,13 @@ public class VoucherServiceImpl implements VoucherService {
     
         System.out.println("[NOTIFY] " + updated.getSubmittedBy() +
                 " — Your voucher " + updated.getVoucherNumber() + " has been APPROVED.");
+
+        // ✅ Send FCM notification
+        notificationService.sendNotification(
+            "USER_FCM_TOKEN_HERE", //Replace this with actual token (e.g., from user table)
+            "Voucher Approved",
+            "Your voucher " + updated.getVoucherNumber() + " has been approved."
+        );
     
         return mapToResponse(updated);
     }
@@ -108,6 +118,12 @@ public class VoucherServiceImpl implements VoucherService {
     
         System.out.println("[NOTIFY] " + updated.getSubmittedBy() +
                 " — Your voucher " + updated.getVoucherNumber() + " has been REJECTED.");
+
+        notificationService.sendNotification(
+                "USER_FCM_TOKEN_HERE",
+                "Voucher Rejected",
+                "Your voucher " + updated.getVoucherNumber() + " has been rejected."
+        );
     
         return mapToResponse(updated);
     }
