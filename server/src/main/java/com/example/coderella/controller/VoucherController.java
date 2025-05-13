@@ -54,4 +54,45 @@ public class VoucherController {
                         .build()
         );
     }
+
+    @PutMapping("/{id}/approve")
+    public ResponseEntity<ApiResponse<VoucherResponse>> approveVoucher(@PathVariable Long id) {
+        VoucherResponse response = voucherService.approveVoucher(id); 
+        return ResponseEntity.ok(
+                ApiResponse.<VoucherResponse>builder()
+                        .status(200)
+                        .message("Voucher approved successfully")
+                        .data(response) 
+                        .build()
+        );
+    }
+    
+
+    @PutMapping("/{id}/reject")
+    public ResponseEntity<ApiResponse<VoucherResponse>> rejectVoucher(@PathVariable Long id) {
+    VoucherResponse response = voucherService.rejectVoucher(id); 
+    return ResponseEntity.ok(
+            ApiResponse.<VoucherResponse>builder()
+                    .status(200)
+                    .message("Voucher rejected successfully")
+                    .data(response) 
+                    .build()
+    );
+}
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<ApiResponse<VoucherResponse>> deleteVoucher(@PathVariable Long id) {
+        VoucherResponse response = voucherService.deleteVoucher(id);
+        return ResponseEntity.ok(
+                ApiResponse.<VoucherResponse>builder()
+                        .status(200)
+                        .message("Voucher deleted successfully")
+                        .data(response) 
+                        .build()
+        );
+    }
+
+
+
+
 }

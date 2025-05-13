@@ -79,4 +79,53 @@ public class VoucherServiceImpl implements VoucherService {
         } while (repository.findByVoucherNumber(voucherNumber).isPresent());
         return voucherNumber;
     }
+
+    @Override
+    @Transactional
+    public VoucherResponse approveVoucher(Long id) {
+        Voucher voucher = repository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Voucher not found"));
+    
+        voucher.setStatus("APPROVED");
+        voucher.setApprovedAt(java.time.LocalDateTime.now());
+        Voucher updated = repository.save(voucher);
+    
+        System.out.println("[NOTIFY] " + updated.getSubmittedBy() +
+                " — Your voucher " + updated.getVoucherNumber() + " has been APPROVED.");
+    
+        return mapToResponse(updated);
+    }
+    
+    @Override
+    @Transactional
+    public VoucherResponse rejectVoucher(Long id) {
+        Voucher voucher = repository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Voucher not found"));
+    
+        voucher.setStatus("REJECTED");
+        voucher.setApprovedAt(null);
+        Voucher updated = repository.save(voucher);
+    
+        System.out.println("[NOTIFY] " + updated.getSubmittedBy() +
+                " — Your voucher " + updated.getVoucherNumber() + " has been REJECTED.");
+    
+        return mapToResponse(updated);
+    }
+
+    @Override
+    @Transactional
+    public VoucherResponse deleteVoucher(Long id) {
+    Voucher voucher = repository.findById(id)
+            .orElseThrow(() -> new EntityNotFoundException("Voucher not found"));
+
+    repository.delete(voucher);
+
+    System.out.println("[ADMIN ACTION] Voucher " + voucher.getVoucherNumber() + " deleted.");
+
+    return mapToResponse(voucher);
+    }
+
+
+    
+
 }

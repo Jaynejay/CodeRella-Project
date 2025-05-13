@@ -9,4 +9,14 @@ public interface VoucherService {
     VoucherResponse submitVoucher(VoucherRequest request);
     List<VoucherResponse> getVouchersByUser(String userId);
     List<VoucherResponse> getAllVouchers();
+
+    VoucherResponse approveVoucher(Long id);
+    VoucherResponse rejectVoucher(Long id);
+    VoucherResponse deleteVoucher(Long id);
+
+
+
+
+    
+
 }
