@@ -6,6 +6,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { feedbackSchema } from "../../schemas/feedbackSchema";
 import { useAccountData, useSubmitFeedback } from "../../hooks/usePayments";
 import toast from "react-hot-toast";
+import DateRangePicker from "../common/DateRangePicker";
+import IconWithTooltip from "../common/IconWithTooltip";
 
 const ITEMS_PER_PAGE = 5;
 
@@ -14,6 +16,8 @@ const AccountTab = () => {
   const feedbackMutation = useSubmitFeedback();
   const [page, setPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
 
   const {
     register,
@@ -35,12 +39,18 @@ const AccountTab = () => {
   };
 
   const filteredHistory =
-    data?.history?.filter((item) =>
-      [item.paper, item.voucher, item.status]
+    data?.history?.filter((item) => {
+      const matchesSearch = [item.paper, item.voucher, item.status]
         .join(" ")
         .toLowerCase()
-        .includes(searchTerm.toLowerCase())
-    ) || [];
+        .includes(searchTerm.toLowerCase());
+
+      const itemDate = new Date(item.date);
+      const afterStart = startDate ? itemDate >= new Date(startDate) : true;
+      const beforeEnd = endDate ? itemDate <= new Date(endDate) : true;
+
+      return matchesSearch && afterStart && beforeEnd;
+    }) || [];
 
   const paginatedHistory = filteredHistory.slice(
     (page - 1) * ITEMS_PER_PAGE,
@@ -113,13 +123,26 @@ const AccountTab = () => {
         <div className="bg-white p-6 rounded-2xl shadow">
           <h2 className="text-lg font-semibold mb-4">History</h2>
 
-          <input
-            type="text"
-            placeholder="Search by paper, voucher, or status..."
-            className="w-full mb-4 p-2 border rounded"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4">
+            <IconWithTooltip label="Search for paper, voucher, or status">
+            <input
+              type="text"
+              placeholder="Search by paper, voucher, or status..."
+              className="w-full p-2 border rounded"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+            </IconWithTooltip>
+
+            <IconWithTooltip label="Select date range to filter">
+              <DateRangePicker
+                startDate={startDate}
+                endDate={endDate}
+                setStartDate={setStartDate}
+                setEndDate={setEndDate}
+              />
+            </IconWithTooltip>
+          </div>
 
           <div className="overflow-x-auto">
             <table className="w-full text-sm">

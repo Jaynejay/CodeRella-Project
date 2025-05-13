@@ -3,6 +3,8 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Skeleton from "react-loading-skeleton";
 import toast from "react-hot-toast";
+import DateRangePicker from "../common/DateRangePicker";
+import IconWithTooltip from "../common/IconWithTooltip";
 
 import { voucherSchema } from "../../schemas/voucherSchema";
 import {
@@ -17,6 +19,9 @@ const ITEMS_PER_PAGE = 5;
 const VoucherTab = () => {
   const [page, setPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
+
   const [rateForm, setRateForm] = useState({
     courseCode: "",
     subjectCode: "",
@@ -69,12 +74,25 @@ const VoucherTab = () => {
     paymentRateMutation.mutate(rateForm);
   };
 
-  const filteredVouchers = vouchers?.filter((v) =>
-    [v.registrationId, v.examName, v.courseCode, v.subjectCode, v.status]
-      .join(" ")
-      .toLowerCase()
-      .includes(searchTerm.toLowerCase())
-  ) || [];
+  const filteredVouchers =
+    vouchers?.filter((v) => {
+      const matchesSearch = [
+        v.registrationId,
+        v.examName,
+        v.courseCode,
+        v.subjectCode,
+        v.status,
+      ]
+        .join(" ")
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase());
+
+      const vDate = new Date(v.submittedAt);
+      const afterStart = startDate ? vDate >= new Date(startDate) : true;
+      const beforeEnd = endDate ? vDate <= new Date(endDate) : true;
+
+      return matchesSearch && afterStart && beforeEnd;
+    }) || [];
 
   const totalPages = Math.ceil(filteredVouchers.length / ITEMS_PER_PAGE);
   const paginatedVouchers = filteredVouchers.slice(
@@ -100,7 +118,9 @@ const VoucherTab = () => {
             >
               <option value="">Select Course Code</option>
               {rateOptions.courseCodes.map((c) => (
-                <option key={c} value={c}>{c}</option>
+                <option key={c} value={c}>
+                  {c}
+                </option>
               ))}
             </select>
 
@@ -113,7 +133,9 @@ const VoucherTab = () => {
             >
               <option value="">Select Subject Code</option>
               {rateOptions.subjectCodes.map((s) => (
-                <option key={s} value={s}>{s}</option>
+                <option key={s} value={s}>
+                  {s}
+                </option>
               ))}
             </select>
 
@@ -126,7 +148,9 @@ const VoucherTab = () => {
             >
               <option value="">Select Paper Duration</option>
               {rateOptions.durations.map((d) => (
-                <option key={d} value={d}>{d} hours</option>
+                <option key={d} value={d}>
+                  {d} hours
+                </option>
               ))}
             </select>
 
@@ -157,89 +181,103 @@ const VoucherTab = () => {
           ) : null}
         </div>
 
-        {/* Right: Voucher Form */}
-        <div className="bg-white shadow rounded-2xl p-6 space-y-4">
-          <h2 className="text-xl font-semibold mb-2">Voucher</h2>
-          <p className="text-sm text-gray-600 mb-4">
-            Please fill out the form to generate your voucher!
-          </p>
+          {/* Right: Voucher Form */}
+          <div className="bg-white shadow rounded-2xl p-6 space-y-4">
+                    <h2 className="text-xl font-semibold mb-2">Voucher</h2>
+                    <p className="text-sm text-gray-600 mb-4">
+                        Please fill out the form to generate your voucher!
+                    </p>
 
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-            <input
-              type="text"
-              placeholder="Registration ID"
-              {...register("registrationId")}
-              className="w-full p-2 border border-gray-300 rounded-md"
-            />
-            {errors.registrationId && (
-              <p className="text-red-600 text-sm">
-                {errors.registrationId.message}
-              </p>
-            )}
+                    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+                        <input
+                            type="text"
+                            placeholder="Registration ID"
+                            {...register("registrationId")}
+                            className="w-full p-2 border border-gray-300 rounded-md"
+                        />
+                        {errors.registrationId && (
+                            <p className="text-red-600 text-sm">{errors.registrationId.message}</p>
+                        )}
 
-            <input
-              type="text"
-              placeholder="Exam Name"
-              {...register("examName")}
-              className="w-full p-2 border border-gray-300 rounded-md"
-            />
-            {errors.examName && (
-              <p className="text-red-600 text-sm">{errors.examName.message}</p>
-            )}
+                        <input
+                            type="text"
+                            placeholder="Exam Name"
+                            {...register("examName")}
+                            className="w-full p-2 border border-gray-300 rounded-md"
+                        />
+                        {errors.examName && (
+                            <p className="text-red-600 text-sm">{errors.examName.message}</p>
+                        )}
 
-            <input
-              type="text"
-              placeholder="Course Code"
-              {...register("courseCode")}
-              className="w-full p-2 border border-gray-300 rounded-md"
-            />
-            {errors.courseCode && (
-              <p className="text-red-600 text-sm">
-                {errors.courseCode.message}
-              </p>
-            )}
+                        <input
+                            type="text"
+                            placeholder="Course Code"
+                            {...register("courseCode")}
+                            className="w-full p-2 border border-gray-300 rounded-md"
+                        />
+                        {errors.courseCode && (
+                            <p className="text-red-600 text-sm">{errors.courseCode.message}</p>
+                        )}
 
-            <input
-              type="text"
-              placeholder="Subject Code"
-              {...register("subjectCode")}
-              className="w-full p-2 border border-gray-300 rounded-md"
-            />
-            {errors.subjectCode && (
-              <p className="text-red-600 text-sm">
-                {errors.subjectCode.message}
-              </p>
-            )}
+                        <input
+                            type="text"
+                            placeholder="Subject Code"
+                            {...register("subjectCode")}
+                            className="w-full p-2 border border-gray-300 rounded-md"
+                        />
+                        {errors.subjectCode && (
+                            <p className="text-red-600 text-sm">{errors.subjectCode.message}</p>
+                        )}
 
-            <textarea
-              rows={3}
-              placeholder="Message (optional)"
-              {...register("message")}
-              className="w-full p-2 border border-gray-300 rounded-md"
-            />
+                        <textarea
+                            rows={3}
+                            placeholder="Message (optional)"
+                            {...register("message")}
+                            className="w-full p-2 border border-gray-300 rounded-md"
+                        />
 
-            <button
-              type="submit"
-              disabled={submitMutation.isLoading}
-              className="w-full bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
-            >
-              Submit
-            </button>
-          </form>
-        </div>
+                        <button
+                            type="submit"
+                            disabled={submitMutation.isLoading}
+                            className="w-full bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
+                        >
+                            Submit
+                        </button>
+                    </form>
+                </div>
+           
+
       </div>
+
+      
 
       {/* Submitted Vouchers */}
       <div className="bg-white shadow rounded-2xl p-6">
-        <h2 className="text-lg font-semibold mb-4">Submitted Voucher Requests</h2>
+        <h2 className="text-lg font-semibold mb-4">
+          Submitted Voucher Requests
+        </h2>
 
-        <input
-          type="text"
-          placeholder="Search vouchers..."
-          className="w-full mb-4 p-2 border rounded"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-        />
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4">
+         
+          <input
+            type="text"
+            placeholder="Search vouchers..."
+            className="w-full md:w-1/2 p-2 border rounded"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+          
+
+          <div className="pl-20">Filter by date:</div>
+          <IconWithTooltip label="Select date range to filter">
+          <DateRangePicker
+            startDate={startDate}
+            endDate={endDate}
+            setStartDate={setStartDate}
+            setEndDate={setEndDate}
+          />
+          </IconWithTooltip>
+        </div>
 
         {isVouchersLoading ? (
           <Skeleton count={5} height={20} />
