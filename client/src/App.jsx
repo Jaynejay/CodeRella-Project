@@ -7,7 +7,6 @@ import {
   Route,
   Navigate,
 } from "react-router-dom";
-import LoginPage from "./pages/LoginPage";
 import SignupPage from "./pages/SignupPage";
 import ProfilePage from "./pages/ProfilePage";
 import AdminPanel from "./pages/AdminPanel";
@@ -18,35 +17,29 @@ import CourseAdminPage from "./pages/CourseAdminPage";
 import PendingRequests from "./pages/PendingRequests";
 import CreateUserPage from "./pages/CreateUserPage";
 
-import LandingPage from "./pages/LandingPage";
-import AccountSetup from "./pages/AccountSetup";
-import RegistrationForm from "./pages/RegistrationForm";
-import Forgotpw1 from "./pages/Forgotpw1";
-import Changepw1 from "./pages/changepw1";
-import AdminDashboard from "./pages/AdminDashboard";
-import PaperSetterList from "./pages/PaperSetterList";
+
+//File upload Functionality
 import FileUploadPage from "./pages/FileUploadPage";
 import AddSubmissionPage from "./pages/AddSubmissionPage";
-import ExamManagement2 from "./pages/ExamAdministrator/ExamManagement2";
 import ExamDates from "./pages/ExamDates";
+
+//Exam Administrator
+import ExamManagement2 from "./pages/ExamAdministrator/ExamManagement2";
+
 function App() {
   return (
     <div className="App">
       <Routes>
-        <Route path="/landing" element={<LandingPage />} />
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/account" element={<AccountSetup />} />
-        <Route path="/registration" element={<RegistrationForm />} />
-        <Route path="/forgotpw" element={<Forgotpw1 />} />
-        <Route path="/changepw" element={<Changepw1 />} />
-        <Route path="/admin" element={<AdminDashboard />} />
+        
+        {/* File upload Routes */}
         <Route path="/upload" element={<FileUploadPage />} />
         <Route path="/addsubmission" element={<AddSubmissionPage />} />
         <Route path="/examdates" element={<ExamDates />} />
+
+        {/* Exam Management */}
         <Route path="/exam-management" element={<ExamManagement2 />} />
           
-        //from dev
-        <Route path="/" element={<LoginPage />} />
+       
         <Route path="/signup" element={<SignupPage />} />
         <Route path="/complete-profile" element={<ProfilePage />} />
         <Route path="/admin" element={<AdminPanel />} />
@@ -57,8 +50,8 @@ function App() {
         <Route path="/admin/course-admins" element={<CourseAdminPage />} />
         <Route path="/admin/create" element={<CreateUserPage />} />
 
-        {/* Redirect from root to landing page */}
-        <Route path="/" element={<Navigate to="/landing" replace />} />
+        {/* Redirect from root to landing page 
+        <Route path="/" element={<Navigate to="/landing" replace />} />*/}
       </Routes>
     </div>
   );
