@@ -4,7 +4,11 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
 
+@Getter
+@Setter
 @Entity
 @Table(name = "exams")
 @Data
@@ -28,10 +32,12 @@ public class Exam {
     @Column(name = "image_url")
     private String imageUrl;
 
-    public Exam(){}
-        public Exam(String title, Integer year,String imageUrl ){
-            this.title = title;
-            this.year = year;
-            this.imageUrl = imageUrl;
+    // Custom constructor if needed
+    /*
+    public Exam(String title, Integer year, String imageUrl) {
+        this.title = title;
+        this.year = year;
+        this.imageUrl = imageUrl;
     }
+    */
 }

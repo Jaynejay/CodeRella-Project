@@ -4,8 +4,13 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import lombok.Getter;
+import lombok.Setter;
+
 import java.time.LocalDateTime;
 
+@Getter
+@Setter
 @Entity
 public class Submission {
     @Id
@@ -18,16 +23,20 @@ public class Submission {
     private LocalDateTime uploadTime;
 
     public void setFileName(String fileName) {
+        this.fileName = fileName;
     }
 
     public void setFilePath(String absolutePath) {
+        this.filePath = absolutePath;
     }
 
     public void setComment(String comment) {
+        this.comment = comment;
     }
 
     public void setUploadTime(LocalDateTime now) {
+        this.uploadTime = now;
     }
 
-    // Getters and setters
+
 }

@@ -1,4 +1,3 @@
-
 /* eslint-disable no-unused-vars */
 import React from "react";
 import {
@@ -30,6 +29,8 @@ function App() {
   return (
     <div className="App">
       <Routes>
+        {/* Root Route - redirect to exam management */}
+        <Route path="/" element={<Navigate to="/exam-management" replace />} />
         
         {/* File upload Routes */}
         <Route path="/upload" element={<FileUploadPage />} />
@@ -49,9 +50,6 @@ function App() {
         <Route path="/admin/payment-coordinators"element={<PaymentCoordinatorPage />} />
         <Route path="/admin/course-admins" element={<CourseAdminPage />} />
         <Route path="/admin/create" element={<CreateUserPage />} />
-
-        {/* Redirect from root to landing page 
-        <Route path="/" element={<Navigate to="/landing" replace />} />*/}
       </Routes>
     </div>
   );

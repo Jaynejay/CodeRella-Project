@@ -2,7 +2,6 @@ package com.example.coderellaProject.controller;
 
 import com.example.coderellaProject.model.Exam;
 import com.example.coderellaProject.repository.ExamRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

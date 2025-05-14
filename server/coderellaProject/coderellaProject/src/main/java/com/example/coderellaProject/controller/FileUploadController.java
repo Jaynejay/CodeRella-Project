@@ -14,6 +14,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/files")
+@CrossOrigin(origins = "*")
 public class FileUploadController {
 
     @Value("${file.upload-dir:uploads}")

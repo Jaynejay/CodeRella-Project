@@ -1,7 +1,7 @@
 package com.example.coderellaProject.controller;
 
 import com.example.coderellaProject.model.Submission;
-import com.example.coderellaProject.repository.UserRepository;
+import com.example.coderellaProject.repository.SubmissionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,7 +19,7 @@ import java.util.UUID;
 public class UserController {
 
     @Autowired
-    private UserRepository userRepository;
+    private SubmissionRepository submissionRepository;
 
     private final String uploadDir = "uploads/";
 
@@ -39,7 +39,7 @@ public class UserController {
         submission.setFilePath(dest.getAbsolutePath());
         submission.setComment(comment);
         submission.setUploadTime(LocalDateTime.now());
-        userRepository.save(submission);
+        submissionRepository.save(submission);
 
         return ResponseEntity.ok("File uploaded successfully!");
     }
