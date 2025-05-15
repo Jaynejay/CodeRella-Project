@@ -41,7 +41,7 @@ export default function ExamCard({ code, title, year, imageUrl, onEdit, onDelete
         </div>
       )}
       <div className="text-base font-bold text-gray-700 mb-1">{code}</div>
-      <div className="text-xl font-extrabold text-center text-gray-800 mb-2">{title}</div>
+      <div className="text-xl text-center text-gray-800 mb-2">{title}</div>
       <div className="text-lg font-bold text-blue-600 mb-2">Year: {year}</div>
       <button
         className="absolute top-3 right-3 p-1 rounded-full hover:bg-gray-100"
