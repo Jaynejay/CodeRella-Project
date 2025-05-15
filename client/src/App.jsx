@@ -24,6 +24,12 @@ import ExamDates from "./pages/ExamDates";
 
 //Exam Administrator
 import ExamManagement2 from "./pages/ExamAdministrator/ExamManagement2";
+import ExamCourses from './pages/ExamAdministrator/ExamCourses';
+import SubjectDetailsPage from './pages/ExamAdministrator/SubjectDetailsPage';
+import PaperSetterAssignPage from './pages/ExamAdministrator/PaperSetterAssignPage';
+import PaperSetterListPage from './pages/ExamAdministrator/PaperSetterListPage';
+import UploadedPapersPage from './pages/ExamAdministrator/UploadedPapersPage';
+import UploadedPaperDetail from './pages/ExamAdministrator/UploadedPaperDetail';
 
 function App() {
   return (
@@ -39,6 +45,12 @@ function App() {
 
         {/* Exam Management */}
         <Route path="/exam-management" element={<ExamManagement2 />} />
+        <Route path="/exam-management/:examId" element={<ExamCourses />} />
+        <Route path="/exam-management/:examId/course/:courseId" element={<SubjectDetailsPage />} />
+        <Route path="/exam-management/:examId/course/:courseId/papersetter/:papersetterId/assign" element={<PaperSetterAssignPage />} />
+        <Route path="/exam-management/:examId/course/:courseId/papersetters" element={<PaperSetterListPage />} />
+        <Route path="/uploaded-papers" element={<UploadedPapersPage />} />
+        <Route path="/uploaded-paper-detail" element={<UploadedPaperDetail />} />
           
        
         <Route path="/signup" element={<SignupPage />} />

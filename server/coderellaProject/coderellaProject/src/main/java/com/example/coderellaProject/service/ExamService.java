@@ -2,8 +2,8 @@ package com.example.coderellaProject.service;
 import com.example.coderellaProject.model.Exam;
 import com.example.coderellaProject.repository.ExamRepository;
 import org.springframework.stereotype.Service;
-
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ExamService {
@@ -17,11 +17,31 @@ public class ExamService {
         return examRepository.findAll();
     }
 
-    public Exam addExam(Exam exam) {
+    public Optional<Exam> getExamById(Long id) {
+        return examRepository.findById(id);
+    }
+
+    public Exam createExam(Exam exam) {
         return examRepository.save(exam);
+    }
+
+    public Exam updateExam(Long id, Exam examDetails) {
+        return examRepository.findById(id)
+            .map(exam -> {
+                exam.setTitle(examDetails.getTitle());
+                exam.setCode(examDetails.getCode());
+                exam.setYear(examDetails.getYear());
+                exam.setImageUrl(examDetails.getImageUrl());
+                return examRepository.save(exam);
+            })
+            .orElseThrow(() -> new RuntimeException("Exam not found with id: " + id));
     }
 
     public void deleteExam(Long id) {
         examRepository.deleteById(id);
+    }
+
+    public List<Exam> searchExams(String keyword) {
+        return examRepository.searchExams(keyword);
     }
 }

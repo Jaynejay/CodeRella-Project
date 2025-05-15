@@ -6,12 +6,16 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import lombok.Getter;
 import lombok.Setter;
-
+import lombok.NoArgsConstructor;
+import jakarta.persistence.Table;
 import java.time.LocalDateTime;
 
 @Getter
 @Setter
+@NoArgsConstructor
 @Entity
+@Table(name = "submissions") // Specify the table name
+
 public class Submission {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

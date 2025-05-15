@@ -6,7 +6,7 @@ function NavBarExam() {
   const location = useLocation();
 
   return (
-    <header className="bg-white shadow-md py-4 px-8 flex items-center justify-between">
+    <header className="fixed top-0 left-0 right-0 bg-white shadow-md py-4 px-8 flex items-center justify-between z-40 w-full">
       <div className="flex items-center space-x-10">
         <img src={logo} alt="Logo" className="h-12" />
         <nav className="flex space-x-10 text-gray-700 font-semibold">
@@ -23,8 +23,8 @@ function NavBarExam() {
             Announcements
           </Link>
           <Link
-            to="/exams"
-            className={location.pathname.startsWith("/exams") ? "text-blue-600" : "hover:text-blue-600"}
+            to="/exam-management"
+            className={location.pathname === "/exam-management" ? "text-blue-600" : "hover:text-blue-600"}
           >
             Exam
           </Link>

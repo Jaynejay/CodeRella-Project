@@ -1,10 +1,9 @@
 package com.example.coderellaProject.controller;
 
 import com.example.coderellaProject.model.Exam;
-import com.example.coderellaProject.repository.ExamRepository;
+import com.example.coderellaProject.service.ExamService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 
 @RestController
@@ -12,34 +11,51 @@ import java.util.List;
 @CrossOrigin(origins = "*")
 public class ExamController {
 
-    private final ExamRepository examRepository;
+    private final ExamService examService;
 
-    public ExamController(ExamRepository examRepository) {
-        this.examRepository = examRepository;
+    public ExamController(ExamService examService) {
+        this.examService = examService;
     }
-    //Get all exams
+
     @GetMapping
     public List<Exam> getAllExams() {
-        return examRepository.findAll();
+        return examService.getAllExams();
     }
 
-    // Get exam by ID
     @GetMapping("/{id}")
     public ResponseEntity<Exam> getExamById(@PathVariable Long id) {
-        return examRepository.findById(id)
+        return examService.getExamById(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    //create new course
     @PostMapping
-    public Exam addExam(@RequestBody Exam exam) {
-        return examRepository.save(exam);
+    public Exam createExam(@RequestBody Exam exam) {
+        return examService.createExam(exam);
     }
 
-    //Delete exam
+    @PutMapping("/{id}")
+    public ResponseEntity<Exam> updateExam(@PathVariable Long id, @RequestBody Exam examDetails) {
+        try {
+            Exam updatedExam = examService.updateExam(id, examDetails);
+            return ResponseEntity.ok(updatedExam);
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
     @DeleteMapping("/{id}")
-    public void deleteExam(@PathVariable Long id) {
-        examRepository.deleteById(id);
+    public ResponseEntity<Void> deleteExam(@PathVariable Long id) {
+        try {
+            examService.deleteExam(id);
+            return ResponseEntity.ok().build();
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @GetMapping("/search")
+    public List<Exam> searchExams(@RequestParam String keyword) {
+        return examService.searchExams(keyword);
     }
 }

@@ -32,12 +32,5 @@ public class Exam {
     @Column(name = "image_url")
     private String imageUrl;
 
-    // Custom constructor if needed
-    /*
-    public Exam(String title, Integer year, String imageUrl) {
-        this.title = title;
-        this.year = year;
-        this.imageUrl = imageUrl;
-    }
-    */
+  
 }
