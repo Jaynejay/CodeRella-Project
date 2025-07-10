@@ -1,15 +1,3 @@
-/**
- * NavBarExam Component
- * 
- * The main navigation bar for the exam management section of the application.
- * Features:
- * - Displays the application logo
- * - Provides navigation links to main sections
- * - Shows notification and user profile icons
- * - Highlights the active navigation item
- * - Fixed position at the top of the screen
- */
-
 import { Bell, User } from "lucide-react";
 import logo from "../../assets/images/logo.svg";
 import { Link, useLocation } from "react-router-dom";
