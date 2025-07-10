@@ -1,3 +1,15 @@
+/**
+ * SideBarExam Component
+ * 
+ * The sidebar navigation component for the exam management section.
+ * Features:
+ * - Fixed position on the left side of the screen
+ * - Navigation links to exam management and uploaded papers
+ * - Visual indicators for active routes
+ * - Back to dashboard link
+ * - Responsive design with hover effects
+ */
+
 import { Book, FileText } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 

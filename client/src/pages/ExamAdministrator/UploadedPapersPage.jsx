@@ -1,3 +1,5 @@
+//for uploaded papers page
+
 import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import NavBarExam from '../../components/layout/NavBarExam';
@@ -12,13 +14,14 @@ const mockPapers = [
 ];
 
 export default function UploadedPapersPage() {
+  // State management
   const [search, setSearch] = useState('');
   const [menuOpen, setMenuOpen] = useState(null); // paper id for open menu
   const [papers, setPapers] = useState(mockPapers);
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Update status if coming back from detail page
+  // Updates paper status when returning from detail page
   useEffect(() => {
     if (location.state?.id && location.state?.verified) {
       setPapers(prev =>
@@ -29,6 +32,7 @@ export default function UploadedPapersPage() {
     }
   }, [location.state]);
 
+  // Filters papers based on search query
   const filteredPapers = papers.filter(ps =>
     ps.name.toLowerCase().includes(search.toLowerCase()) ||
     ps.regId.toLowerCase().includes(search.toLowerCase())

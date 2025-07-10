@@ -1,3 +1,5 @@
+//For manage subject details
+
 // import { useParams } from 'react-router-dom';
 import { useState } from 'react';
 import PropTypes from 'prop-types';
@@ -22,6 +24,10 @@ const mockSubjects = [
   { id: 8, code: 'SUB_08', name: 'Computer Aided Draughtsmanship (Auto CAD)' },
 ];
 
+/**
+ * Toast Component
+ * Displays temporary success/error messages to the user
+ */
 function Toast({ message, type, onClose }) {
   if (!message) return null;
   return (
@@ -37,6 +43,10 @@ Toast.propTypes = {
   onClose: PropTypes.func
 };
 
+/**
+ * SubjectDetailsPage Component
+ * Main component for managing subject details
+ */
 export default function SubjectDetailsPage() {
   // const { examId, courseId } = useParams();
   const [search, setSearch] = useState('');
@@ -46,11 +56,13 @@ export default function SubjectDetailsPage() {
   const [menuOpen, setMenuOpen] = useState(null); // subject id for open menu
   const navigate = useNavigate();
 
+  // Shows toast message for 2 seconds
   const showToast = (message, type = 'success') => {
     setToast({ message, type });
     setTimeout(() => setToast({ message: '', type }), 2000);
   };
 
+  // Filters subjects based on search query
   const filteredSubjects = subjects.filter(s =>
     s.name.toLowerCase().includes(search.toLowerCase()) ||
     s.code.toLowerCase().includes(search.toLowerCase())

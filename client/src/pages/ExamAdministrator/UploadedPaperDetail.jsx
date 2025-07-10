@@ -1,9 +1,12 @@
+//For details about uploaded paper details
+
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import NavBarExam from '../../components/layout/NavBarExam';
 import SideBarExam from '../../components/layout/SideBarExam';
 
 export default function UploadedPaperDetail() {
+  // State management
   const { state } = useLocation();
   const navigate = useNavigate();
   const [verified, setVerified] = useState(state?.paper?.verified || false);
@@ -13,6 +16,7 @@ export default function UploadedPaperDetail() {
     return <div className="p-8">No paper data found.</div>;
   }
 
+  // Verifies the paper and updates status
   const handleVerify = () => {
     setVerified(true);
     setToast('Paper verified successfully!');

@@ -1,3 +1,4 @@
+//for assign paper setters
 import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import PropTypes from 'prop-types';
@@ -10,6 +11,10 @@ const mockPaperSetter = {
   name: 'Wimalasekera I.S.',
 };
 
+/**
+ * Toast Component
+ * Displays temporary success/error messages to the user
+ */
 function Toast({ message, type, onClose }) {
   if (!message) return null;
   return (
@@ -25,18 +30,25 @@ Toast.propTypes = {
   onClose: PropTypes.func
 };
 
+/**
+ * PaperSetterAssignPage Component
+ * Main component for assigning paper setters to subjects
+ */
 export default function PaperSetterAssignPage() {
+  // State management
   const navigate = useNavigate();
   const [dueDate, setDueDate] = useState('');
   const [notes, setNotes] = useState('');
   const [toast, setToast] = useState({ message: '', type: 'success' });
   const [applied, setApplied] = useState(false);
 
+  // Shows toast message for 2 seconds
   const showToast = (message, type = 'success') => {
     setToast({ message, type });
     setTimeout(() => setToast({ message: '', type }), 2000);
   };
 
+  // Handles assignment submission
   const handleApply = (e) => {
     e.preventDefault();
     if (!dueDate) {
@@ -47,6 +59,7 @@ export default function PaperSetterAssignPage() {
     showToast('Assignment applied successfully!', 'success');
   };
 
+  // Sends notification to paper setter
   const handleSendNotification = () => {
     if (!applied) {
       showToast('Please apply the assignment first.', 'error');
@@ -55,6 +68,7 @@ export default function PaperSetterAssignPage() {
     showToast('Notification sent to paper setter!', 'success');
   };
 
+  // Returns to previous page
   const handleCancel = () => {
     navigate(-1);
   };

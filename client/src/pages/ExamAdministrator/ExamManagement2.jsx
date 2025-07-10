@@ -1,3 +1,4 @@
+//for manage exams
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import AddExamCard from "../../components/ExamAdminDashboard/AddExamCard";
@@ -7,6 +8,10 @@ import NavBarExam from "../../components/layout/NavBarExam";
 import SideBarExam from "../../components/layout/SideBarExam";
 import PropTypes from 'prop-types';
 
+/**
+ * Toast Component
+ * Displays temporary success/error messages to the user
+ */
 function Toast({ message, type, onClose }) {
   if (!message) return null;
   return (
@@ -23,7 +28,12 @@ Toast.propTypes = {
   onClose: PropTypes.func
 };
 
+/**
+ * DashboardPage Component
+ * Main component that manages the exam dashboard functionality
+ */
 export default function DashboardPage() {
+  // State management for exams and UI
   const [exams, setExams] = useState([]);
   const [filteredExams, setFilteredExams] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -35,11 +45,13 @@ export default function DashboardPage() {
   const [toast, setToast] = useState({ message: '', type: 'success' });
   const navigate = useNavigate();
 
+  // Shows toast message for 2.5 seconds
   const showToast = (message, type = 'success') => {
     setToast({ message, type });
     setTimeout(() => setToast({ message: '', type }), 2500);
   };
 
+  // Fetches all exams from the API
   const fetchExams = async () => {
     try {
       setLoading(true);
@@ -61,6 +73,7 @@ export default function DashboardPage() {
     fetchExams();
   }, []);
 
+  // Filters exams based on search query
   const handleSearch = () => {
     const filtered = exams.filter(exam => 
       exam.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -75,10 +88,12 @@ export default function DashboardPage() {
     }
   };
 
+  // Handles form input changes
   const handleFormChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
+  // Adds a new exam
   const handleAddExam = async (e) => {
     e.preventDefault();
     setFormError("");
@@ -99,6 +114,7 @@ export default function DashboardPage() {
     }
   };
 
+  // Prepares exam for editing
   const handleEditExam = (exam) => {
     setEditExam(exam);
     setForm({
@@ -110,6 +126,7 @@ export default function DashboardPage() {
     setShowAddForm(false);
   };
 
+  // Updates an existing exam
   const handleUpdateExam = async (e) => {
     e.preventDefault();
     setFormError("");
@@ -130,6 +147,7 @@ export default function DashboardPage() {
     }
   };
 
+  // Deletes an exam after confirmation
   const handleDeleteExam = async (id) => {
     if (window.confirm("Are you sure you want to delete this exam?")) {
       try {

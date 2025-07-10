@@ -1,33 +1,100 @@
 import { useParams, useNavigate } from 'react-router-dom';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { paperSetterAPI, subjectAPI } from '../../services/api';
 import NavBarExam from '../../components/layout/NavBarExam';
 import SideBarExam from '../../components/layout/SideBarExam';
-
-const mockSubject = {
-  code: 'SUB_01',
-  name: 'Technical Drawing',
-};
-
-const mockPaperSetters = [
-  { id: 1, regId: 'DTET_PS5431', name: 'Wimalasekera I.S.' },
-  { id: 2, regId: 'DTET_PS7721', name: 'Amarathunga A.T.' },
-  { id: 3, regId: 'DTET_PS4788', name: 'Jayaprabha P.H.J.' },
-  { id: 4, regId: 'DTET_PS229', name: 'Amarasiri K.J.M.' },
-  { id: 5, regId: 'DTET_PS5296', name: 'Lokupathirage I.M.' },
-  { id: 6, regId: 'DTET_PS2311', name: 'Wijerathna S.M.' },
-  { id: 7, regId: 'DTET_PS5111', name: 'Jayathilake P.P.P.' },
-  { id: 8, regId: 'DTET_PS8957', name: 'Abesekara I.M.' },
-];
 
 export default function PaperSetterListPage() {
   const { examId, courseId } = useParams();
   const navigate = useNavigate();
   const [search, setSearch] = useState('');
+  const [paperSetters, setPaperSetters] = useState([]);
+  const [subject, setSubject] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  const filteredPaperSetters = mockPaperSetters.filter(ps =>
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        
+        // Fetch paper setters
+        const paperSettersResponse = await paperSetterAPI.getAll();
+        setPaperSetters(paperSettersResponse.data);
+        
+        // Fetch subject details if courseId is provided
+        if (courseId) {
+          try {
+            const subjectResponse = await subjectAPI.getByCourseId(courseId);
+            if (subjectResponse.data && subjectResponse.data.length > 0) {
+              setSubject(subjectResponse.data[0]); // Assuming we want the first subject
+            }
+          } catch (subjectError) {
+            console.warn('Could not fetch subject details:', subjectError);
+          }
+        }
+      } catch (err) {
+        console.error('Error fetching data:', err);
+        setError('Failed to load paper setters. Please try again.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [courseId]);
+
+  const filteredPaperSetters = paperSetters.filter(ps =>
     ps.name.toLowerCase().includes(search.toLowerCase()) ||
-    ps.regId.toLowerCase().includes(search.toLowerCase())
+    ps.registrationId.toLowerCase().includes(search.toLowerCase())
   );
+
+  const handleAssign = (paperSetterId) => {
+    navigate(`/exam-management/${examId}/course/${courseId}/papersetter/${paperSetterId}/assign`);
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex flex-col bg-gray-100">
+        <NavBarExam />
+        <div className="flex flex-1">
+          <SideBarExam />
+          <main className="flex-1 p-8" style={{ marginLeft: '18rem', marginTop: '5.5rem' }}>
+            <div className="bg-white rounded-2xl shadow-lg p-8">
+              <div className="flex items-center justify-center h-64">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+              </div>
+            </div>
+          </main>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen flex flex-col bg-gray-100">
+        <NavBarExam />
+        <div className="flex flex-1">
+          <SideBarExam />
+          <main className="flex-1 p-8" style={{ marginLeft: '18rem', marginTop: '5.5rem' }}>
+            <div className="bg-white rounded-2xl shadow-lg p-8">
+              <div className="text-center text-red-600">
+                <p className="text-lg font-semibold">{error}</p>
+                <button 
+                  onClick={() => window.location.reload()} 
+                  className="mt-4 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
+                >
+                  Retry
+                </button>
+              </div>
+            </div>
+          </main>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-100">
@@ -37,13 +104,13 @@ export default function PaperSetterListPage() {
         <main className="flex-1 p-8" style={{ marginLeft: '18rem', marginTop: '5.5rem' }}>
           <div className="bg-white rounded-2xl shadow-lg p-8">
             <h1 className="text-2xl font-bold text-gray-800 mb-6">
-              {mockSubject.code} - {mockSubject.name}
+              {subject ? `${subject.code} - ${subject.name}` : 'Paper Setters'}
             </h1>
             <div className="flex items-center gap-4 mb-6">
               <div className="relative w-72">
                 <input
                   type="text"
-                  placeholder="Search"
+                  placeholder="Search paper setters..."
                   value={search}
                   onChange={e => setSearch(e.target.value)}
                   className="w-full rounded-full border px-4 py-2 pl-10 shadow focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -63,6 +130,8 @@ export default function PaperSetterListPage() {
                     <th className="p-3">No.</th>
                     <th className="p-3">Registration_ID</th>
                     <th className="p-3">Paper setter Name</th>
+                    <th className="p-3">Email</th>
+                    <th className="p-3">Phone</th>
                     <th className="p-3">Actions</th>
                   </tr>
                 </thead>
@@ -70,12 +139,14 @@ export default function PaperSetterListPage() {
                   {filteredPaperSetters.map((ps, idx) => (
                     <tr key={ps.id} className="border-b last:border-b-0">
                       <td className="p-3">{idx + 1}</td>
-                      <td className="p-3 font-mono">{ps.regId}</td>
+                      <td className="p-3 font-mono">{ps.registrationId}</td>
                       <td className="p-3">{ps.name}</td>
+                      <td className="p-3">{ps.email || '-'}</td>
+                      <td className="p-3">{ps.phone || '-'}</td>
                       <td className="p-3 flex items-center gap-2">
                         <button
                           className="bg-blue-600 text-white px-4 py-1 rounded-full text-sm font-semibold hover:bg-blue-700"
-                          onClick={() => navigate(`/exam-management/${examId}/course/${courseId}/papersetter/${ps.id}/assign`)}
+                          onClick={() => handleAssign(ps.id)}
                         >
                           Assign
                         </button>
@@ -85,13 +156,14 @@ export default function PaperSetterListPage() {
                         >
                           Cancel
                         </button>
-                        {/* Add three-dots menu here if needed */}
                       </td>
                     </tr>
                   ))}
                   {filteredPaperSetters.length === 0 && (
                     <tr>
-                      <td colSpan={4} className="text-center py-8 text-gray-500">No paper setters found.</td>
+                      <td colSpan={6} className="text-center py-8 text-gray-500">
+                        {search ? 'No paper setters found matching your search.' : 'No paper setters available.'}
+                      </td>
                     </tr>
                   )}
                 </tbody>
