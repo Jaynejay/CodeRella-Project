@@ -19,7 +19,7 @@ export default function UserSummaryChart() {
   if (!summary) return <p>Loading summary...</p>;
 
   return (
-    <div className="p-4 shadow rounded bg-white w-full max-w-xs">
+    <div className="p-4 shadow rounded bg-white w-full max-w-xs mb-6">
       <h2 className="text-center font-semibold text-lg mb-2">User Summary</h2>
 
       <div className="text-sm flex justify-between px-2 mb-2">

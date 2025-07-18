@@ -10,25 +10,25 @@ import {
   subMonths,
   isSameMonth,
   isSameDay,
-  format
+  format,
 } from "date-fns";
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/solid";
 
 /** Build weeks-of-days grid for a given month */
 function buildMonthGrid(monthStart) {
-  const today     = new Date();
-  const monthEnd  = endOfMonth(monthStart);
+  const today = new Date();
+  const monthEnd = endOfMonth(monthStart);
   const gridStart = startOfWeek(monthStart, { weekStartsOn: 1 });
-  const weeks     = [];
-  let cursor      = gridStart;
+  const weeks = [];
+  let cursor = gridStart;
 
   while (cursor <= monthEnd) {
     const week = [];
     for (let i = 0; i < 7; i++) {
       week.push({
-        date:      cursor,
+        date: cursor,
         isCurrent: isSameMonth(cursor, monthStart),
-        isToday:   isSameDay(cursor, today),
+        isToday: isSameDay(cursor, today),
       });
       cursor = addDays(cursor, 1);
     }
@@ -44,7 +44,7 @@ export default function Calendar({ events, onEventClick }) {
   const nextMonth = () => setViewDate(addMonths(viewDate, 1));
 
   const monthStart = startOfMonth(viewDate);
-  const weeks      = useMemo(() => buildMonthGrid(monthStart), [monthStart]);
+  const weeks = useMemo(() => buildMonthGrid(monthStart), [monthStart]);
 
   // Index events by ISO date string
   const eventsByDate = useMemo(() => {
@@ -75,7 +75,7 @@ export default function Calendar({ events, onEventClick }) {
 
       {/* Weekday pills */}
       <div className="grid grid-cols-7 gap-2 mb-2">
-        {["Mon","Tue","Wed","Thu","Fri","Sat","Sun"].map((d) => (
+        {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map((d) => (
           <div
             key={d}
             className="bg-blue-800 text-white text-xs font-medium py-1 text-center rounded"

@@ -1,26 +1,33 @@
 // src/components/layout/Footer.jsx
-import AppStoreBadge   from "../../assets/images/store_apple.svg";
+import AppStoreBadge from "../../assets/images/store_apple.svg";
 import GooglePlayBadge from "../../assets/images/store_google.svg";
 
 import {
   PhoneIcon,
   EnvelopeIcon,
   GlobeAltIcon,
-  MapPinIcon
+  MapPinIcon,
 } from "@heroicons/react/24/outline";
 
 const Footer = () => (
   <footer className="w-full bg-gray-400 border-t border-gray-400">
     <div className="mx-auto max-w-7xl px-4 py-16 grid gap-6 md:grid-cols-3">
-
       {/* column 1 – contact */}
       <div>
         <h6 className="mb-2 font-semibold text-gray-700">Contact Us</h6>
         <div className="grid grid-cols-2 gap-1">
-          <a href="tel:+94xxxxxxxxx" aria-label="Call us" className="justify-self-start">
+          <a
+            href="tel:+94xxxxxxxxx"
+            aria-label="Call us"
+            className="justify-self-start"
+          >
             <PhoneIcon className="h-6 w-6 text-blue-800 hover:text-blue-600" />
           </a>
-          <a href="mailto:info@coderella.lk" aria-label="Email us" className="justify-self-end">
+          <a
+            href="mailto:info@coderella.lk"
+            aria-label="Email us"
+            className="justify-self-end"
+          >
             <EnvelopeIcon className="h-6 w-6 text-blue-800 hover:text-blue-600" />
           </a>
           <a
@@ -48,7 +55,9 @@ const Footer = () => (
       <div className="text-center">
         <p className="text-gray-700">
           You are logged in as{" "}
-          <button className="font-medium text-gray-900">Lokupathirage I.M</button>
+          <button className="font-medium text-gray-900">
+            Lokupathirage I.M
+          </button>
         </p>
         <button className="mt-2  hover:text-blue-600 text-gray-600">
           Log Out
@@ -75,7 +84,6 @@ const Footer = () => (
           </a>
         </div>
       </div>
-
     </div>
   </footer>
 );
