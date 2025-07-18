@@ -1,211 +1,234 @@
-import { useState } from 'react';
-import PropTypes from 'prop-types';
+// src/pages/UpdateCourse.jsx
+import { useState, useRef, useEffect } from "react";
+import PropTypes from "prop-types";
+import { Folder, Square, ArrowDown, X } from "lucide-react";
 
-const UpdateCourse = ({ onClose, onSubmit }) => {
-  const [courseCode, setCourseCode] = useState('A01S003F4.3');
-  const [newLevel, setNewLevel] = useState('');
-  const [newCourseName, setNewCourseName] = useState('');
-  const [files, setFiles] = useState([]);
-  const [isDragging, setIsDragging] = useState(false);
+export default function UpdateCourse({ isOpen, onClose, onSubmit, course }) {
+  // ─── Form state: only S. No pre-filled ─────────────────
+  const [sNo]   = useState(course.sNo ?? "");
+  const [level, setLevel] = useState("");
+  const [name,  setName]  = useState("");
+  const [code,  setCode]  = useState("");
+  const [image, setImage] = useState(null);
 
-  const handleDragEnter = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setIsDragging(true);
+  const levels = ["final", "5s1", "5s2", "5s3", "6s1", "6s2"];
+  const fileInputRef = useRef(null);
+
+  // ─── Drag state ───────────────────────────────────────
+  const modalRef = useRef(null);
+  const [dragging, setDragging] = useState(false);
+  const [offset,   setOffset]   = useState({ x: 0, y: 0 });
+  const [origin,   setOrigin]   = useState({ x: 0, y: 0 });
+
+  const onMouseDown = (e) => {
+    if (!e.target.closest(".modal-handle")) return;
+    setDragging(true);
+    setOrigin({
+      x: e.clientX - offset.x,
+      y: e.clientY - offset.y,
+    });
   };
-
-  const handleDragLeave = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setIsDragging(false);
+  const onMouseMove = (e) => {
+    if (!dragging) return;
+    setOffset({
+      x: e.clientX - origin.x,
+      y: e.clientY - origin.y,
+    });
   };
+  const onMouseUp = () => dragging && setDragging(false);
 
-  const handleDragOver = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-  };
-
-  const handleDrop = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setIsDragging(false);
-
-    const droppedFiles = Array.from(e.dataTransfer.files);
-    if (droppedFiles.length > 0) {
-      const validFiles = droppedFiles.filter(file => file.size <= 2 * 1024 * 1024);
-      const newFiles = [...files, ...validFiles].slice(0, 1);
-      setFiles(newFiles);
-    }
-  };
-
-  const handleFileInputChange = (e) => {
-    const selectedFiles = Array.from(e.target.files);
-    if (selectedFiles.length > 0) {
-      const validFiles = selectedFiles.filter(file => file.size <= 2 * 1024 * 1024);
-      const newFiles = [...files, ...validFiles].slice(0, 1);
-      setFiles(newFiles);
-    }
-  };
-
-  const handleSaveChanges = () => {
-    const courseData = {
-      courseCode,
-      newLevel,
-      newCourseName,
-      files
+  useEffect(() => {
+    window.addEventListener("mousemove", onMouseMove);
+    window.addEventListener("mouseup", onMouseUp);
+    return () => {
+      window.removeEventListener("mousemove", onMouseMove);
+      window.removeEventListener("mouseup", onMouseUp);
     };
-    onSubmit(courseData);
+  });
+
+  // ─── File handlers ────────────────────────────────────
+  const handleDragOver   = (e) => e.preventDefault();
+  const handleDrop       = (e) => {
+    e.preventDefault();
+    if (e.dataTransfer.files[0]) setImage(e.dataTransfer.files[0]);
+  };
+  const handleFileChange = (e) => {
+    if (e.target.files[0]) setImage(e.target.files[0]);
   };
 
-  const handleCancel = () => {
-    onClose();
+  const handleSubmit = () => {
+    onSubmit({
+      level,
+      courseName: name,
+      courseCode: code,
+      courseImage: image
+    });
   };
 
-  const handleRemoveFile = (index) => {
-    const newFiles = [...files];
-    newFiles.splice(index, 1);
-    setFiles(newFiles);
-  };
+  if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-      <div className="bg-white rounded-md w-full max-w-lg">
-        <div className="bg-blue-800 text-white py-3 px-4 flex justify-between items-center rounded-t-md">
-          <h2 className="text-lg font-medium">Updating Course</h2>
-          <button 
-            onClick={onClose}
-            className="text-white hover:text-gray-200 text-xl focus:outline-none"
-          >
-            ×
+    <div
+      className="fixed inset-0 z-50"
+      onMouseDown={onMouseDown}
+      style={{ cursor: dragging ? "grabbing" : "default" }}
+    >
+      {/* backdrop */}
+      <div
+        className="absolute inset-0 bg-black bg-opacity-50"
+        onClick={onClose}
+      />
+
+      {/* modal */}
+      <div
+        ref={modalRef}
+        className="absolute w-full max-w-lg bg-white rounded-lg shadow-xl max-h-[90vh] overflow-y-auto"
+        style={{
+          top: `calc(50% + ${offset.y}px)`,
+          left: `calc(50% + ${offset.x}px)`,
+          transform: "translate(-50%, -50%)",
+        }}
+      >
+        {/* header */}
+        <div className="modal-handle bg-indigo-900 text-white px-6 py-4 flex justify-between items-center rounded-t-lg select-none cursor-grab">
+          <h2 className="text-xl font-medium">Update Course</h2>
+          <button onClick={onClose}>
+            <X size={20} className="text-white" />
           </button>
         </div>
 
-        <div className="p-6">
-          {/* Course Code */}
-          <div className="mb-4">
-            <label className="block text-gray-700 mb-2">Course code:</label>
+        {/* body */}
+        <div className="p-8 space-y-6">
+          {/* S. No (readonly) */}
+          <div>
+            <label className="block mb-2 text-sm font-medium">S. No:</label>
             <input
-              type="text"
-              value={courseCode}
-              onChange={(e) => setCourseCode(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              type="number"
+              value={sNo}
+              disabled
+              className="w-full px-4 py-3 border border-gray-300 rounded-md bg-gray-100 cursor-not-allowed"
             />
           </div>
 
-          {/* New Level */}
-          <div className="mb-4">
-            <label className="block text-gray-700 mb-2">New level of the course:</label>
-            <input
-              type="text"
-              value={newLevel}
-              onChange={(e) => setNewLevel(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-
-          {/* New Course Name */}
-          <div className="mb-4">
-            <label className="block text-gray-700 mb-2">New Course Name:</label>
-            <input
-              type="text"
-              value={newCourseName}
-              onChange={(e) => setNewCourseName(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-
-          {/* File Upload */}
-          <div className="mb-6">
-            <label className="block text-gray-700 mb-2">Upload the image of the relevant course:</label>
-            
-            <div className="flex space-x-2 mb-2">
-              {/* First Button */}
-              <label className="cursor-pointer w-12 h-12 border border-gray-300 rounded-md flex items-center justify-center hover:bg-gray-50">
-                <svg className="w-6 h-6 text-blue-600" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M3 7V17C3 18.1046 3.89543 19 5 19H19C20.1046 19 21 18.1046 21 17V9C21 7.89543 20.1046 7 19 7H13L11 5H5C3.89543 5 3 5.89543 3 7Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                </svg>
-                <input 
-                  type="file" 
-                  className="hidden" 
-                  onChange={handleFileInputChange}
-                  accept="image/*"
-                />
-              </label>
-
-              {/* Second Button */}
-              <label className="cursor-pointer w-12 h-12 border border-gray-300 rounded-md flex items-center justify-center hover:bg-gray-50">
-                <svg className="w-6 h-6 text-blue-600" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M13 2H6C4.89543 2 4 2.89543 4 4V20C4 21.1046 4.89543 22 6 22H18C19.1046 22 20 21.1046 20 20V9L13 2Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                  <path d="M13 2V9H20" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                </svg>
-                <input 
-                  type="file" 
-                  className="hidden" 
-                  onChange={handleFileInputChange}
-                  accept="image/*"
-                />
-              </label>
-            </div>
-
-            <div className="text-xs text-gray-500 mb-2">
-              Maximum file size: 2 MB, Maximum number of files 1
-            </div>
-
-            {/* Drag and Drop Area */}
-            <div 
-              className={`border-2 border-dashed rounded-md p-8 text-center ${isDragging ? 'border-blue-500 bg-blue-50' : 'border-gray-300'}`}
-              onDragEnter={handleDragEnter}
-              onDragOver={handleDragOver}
-              onDragLeave={handleDragLeave}
-              onDrop={handleDrop}
+          {/* Level */}
+          <div>
+            <label className="block mb-2 text-sm font-medium">
+              Level of the course:
+            </label>
+            <select
+              value={level}
+              onChange={(e) => setLevel(e.target.value)}
+              className="w-full px-4 py-3 border border-gray-300 rounded-md bg-white"
             >
-              {files.length > 0 ? (
-                <div className="flex flex-col items-center">
-                  <div className="flex items-center justify-between w-full p-2 bg-gray-100 rounded mb-2">
-                    <span className="text-sm truncate max-w-xs">{files[0].name}</span>
-                    <button 
-                      onClick={() => handleRemoveFile(0)} 
-                      className="text-red-500 hover:text-red-700"
-                    >
-                      ×
-                    </button>
-                  </div>
-                </div>
+              <option value="" disabled>— Select level —</option>
+              {levels.map((lvl) => (
+                <option key={lvl} value={lvl}>
+                  {lvl.toUpperCase()}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Name */}
+          <div>
+            <label className="block mb-2 text-sm font-medium">Course Name:</label>
+            <input
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="Enter new course name"
+              className="w-full px-4 py-3 border border-gray-300 rounded-md"
+            />
+          </div>
+
+          {/* Code */}
+          <div>
+            <label className="block mb-2 text-sm font-medium">Course code:</label>
+            <input
+              type="text"
+              value={code}
+              onChange={(e) => setCode(e.target.value)}
+              placeholder="Enter new course code"
+              className="w-full px-4 py-3 border border-gray-300 rounded-md"
+            />
+          </div>
+
+          {/* Image */}
+          <div>
+            <label className="block mb-2 text-sm font-medium">
+              Upload the image of the relevant course:
+            </label>
+            <div className="flex gap-3 mb-3">
+              <button
+                onClick={() => fileInputRef.current.click()}
+                className="p-2 border border-gray-300 rounded-md"
+              >
+                <Folder size={20} className="text-blue-600" />
+              </button>
+              <button
+                onClick={() => fileInputRef.current.click()}
+                className="p-2 border border-gray-300 rounded-md"
+              >
+                <Square size={20} className="text-blue-600" />
+              </button>
+              <span className="text-xs text-gray-500 self-center">
+                Max 2 MB, 1 file
+              </span>
+            </div>
+            <input
+              type="file"
+              ref={fileInputRef}
+              onChange={handleFileChange}
+              className="hidden"
+              accept="image/*"
+            />
+            <div
+              onDragOver={handleDragOver}
+              onDrop={handleDrop}
+              onClick={() => fileInputRef.current.click()}
+              className="border-2 border-dashed border-gray-200 rounded-md p-8 flex flex-col items-center justify-center cursor-pointer"
+            >
+              {image ? (
+                <p className="text-sm text-gray-600">
+                  Selected: {image.name}
+                </p>
               ) : (
-                <div className="flex flex-col items-center">
-                  <svg className="w-8 h-8 text-gray-400 mb-2" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M12 4V20M12 4L8 8M12 4L16 8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                  </svg>
-                  <p className="text-gray-500">You can drag and drop files here to add them.</p>
-                </div>
+                <>
+                  <ArrowDown size={32} className="text-gray-400 mb-4" />
+                  <p className="text-sm text-gray-600">
+                    You can drag & drop files here.
+                  </p>
+                </>
               )}
             </div>
           </div>
+        </div>
 
-          {/* Buttons */}
-          <div className="flex justify-center space-x-4">
-            <button
-              onClick={handleSaveChanges}
-              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              Save changes
-            </button>
-            <button
-              onClick={handleCancel}
-              className="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-500"
-            >
-              Cancel
-            </button>
-          </div>
+        {/* footer */}
+        <div className="px-8 py-6 flex justify-end gap-4">
+          <button
+            onClick={onClose}
+            className="px-4 py-2 bg-white text-gray-700 border border-gray-300 rounded-md"
+          >
+            Cancel
+          </button>
+          <button
+            onClick={handleSubmit}
+            className="px-8 py-2 bg-blue-600 text-white rounded-full font-medium"
+          >
+            Save changes
+          </button>
         </div>
       </div>
     </div>
   );
-};
+}
 
 UpdateCourse.propTypes = {
-  onClose: PropTypes.func.isRequired,
+  isOpen:   PropTypes.bool.isRequired,
+  onClose:  PropTypes.func.isRequired,
   onSubmit: PropTypes.func.isRequired,
+  course:   PropTypes.shape({
+    sNo:    PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  }).isRequired,
 };
-
-export default UpdateCourse;

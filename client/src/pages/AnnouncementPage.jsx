@@ -16,23 +16,33 @@ const fadeInKeyframes = `
 
 export default function AnnouncementPage() {
   const navigate = useNavigate();
-  const [announcements, setAnnouncements] = useState([
-    { id: 1, author: 'I.M. Lokupathirage', title: 'Upgrade the website', date: '10 Dec', message: 'Please upgrade the homepage UI to latest design.', attachments: [] },
-    { id: 2, author: 'P.P.P. Jayathilake', title: 'Scheduled System upgrade', date: '6 Oct', message: 'System will be down for maintenance on Saturday.', attachments: [] },
-    { id: 3, author: 'W.A.T.E. Wadenambi', title: 'Power interruption', date: '2 Aug', message: 'Expect power cuts in sector 5.', attachments: [] },
-    { id: 4, author: 'H.M. Kularathne', title: 'Upgrade the website', date: '15 May', message: 'Backend upgrade scheduled.', attachments: [] },
-    { id: 5, author: 'I. Wimalasekara', title: 'Data free access', date: '19 Feb', message: 'New data plans available.', attachments: [] },
-  ]);
+  const [announcements, setAnnouncements] = useState([]);
   const [starredAnnouncements, setStarredAnnouncements] = useState({});
   const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(false);
   const [activeSidebarItem, setActiveSidebarItem] = useState('inbox');
   const [showComposeForm, setShowComposeForm] = useState(false);
 
+  const loggedInUsername = "papersetter001"; // TODO: Replace with dynamic user
+
   useEffect(() => {
     setLoading(true);
-    const timer = setTimeout(() => setLoading(false), 1000);
-    return () => clearTimeout(timer);
+    fetch(`http://localhost:8080/api/announcements/user/${loggedInUsername}`)
+      .then(res => res.json())
+      .then(data => {
+        // Add formatted date to each announcement
+        const announcementsWithDate = data.map(a => ({
+          ...a,
+          date: new Date(a.date).toLocaleDateString('en-US', { day: 'numeric', month: 'short' }),
+          recipient: a.recipientUsername
+        }));
+        setAnnouncements(announcementsWithDate);
+        setLoading(false);
+      })
+      .catch(err => {
+        console.error("Failed to fetch announcements", err);
+        setLoading(false);
+      });
   }, []);
 
   const handleSidebarItemClick = (item) => setActiveSidebarItem(item);
@@ -43,35 +53,52 @@ export default function AnnouncementPage() {
     setStarredAnnouncements(prev => ({ ...prev, [id]: !prev[id] }));
   };
 
-  const addNewAnnouncement = ({ to, subject, message, files }) => {
-    const nextId = announcements.length + 1;
+  const addNewAnnouncement = ({ to, subject, message }) => {
     const newAnnouncement = {
-      id: nextId,
-      author: 'You',
-      recipient: to,
+      author: 'admin001', // TODO: Replace with dynamic admin
+      recipientUsername: to,
       title: subject,
-      date: new Date().toLocaleDateString('en-US', { day: 'numeric', month: 'short' }),
-      message,
-      attachments: files
+      message: message
     };
-    setAnnouncements(prev => [newAnnouncement, ...prev]);
-    setShowComposeForm(false);
+
+    fetch('http://localhost:8080/api/announcements', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(newAnnouncement)
+    })
+      .then(res => res.json())
+      .then(saved => {
+        const formatted = {
+          ...saved,
+          date: new Date(saved.date).toLocaleDateString('en-US', { day: 'numeric', month: 'short' }),
+          recipient: saved.recipientUsername
+        };
+        setAnnouncements(prev => [formatted, ...prev]);
+        setShowComposeForm(false);
+      })
+      .catch(err => console.error("Failed to send announcement", err));
   };
 
   const deleteAnnouncement = (id, e) => {
     e.stopPropagation();
-    setAnnouncements(prev => prev.filter(a => a.id !== id));
-    setStarredAnnouncements(prev => {
-      const next = { ...prev };
-      delete next[id];
-      return next;
-    });
+    fetch(`http://localhost:8080/api/announcements/${id}`, {
+      method: 'DELETE'
+    })
+      .then(() => {
+        setAnnouncements(prev => prev.filter(a => a.id !== id));
+        setStarredAnnouncements(prev => {
+          const next = { ...prev };
+          delete next[id];
+          return next;
+        });
+      })
+      .catch(err => console.error("Failed to delete announcement", err));
   };
 
   const filteredAnnouncements = announcements
     .filter(a => {
       if (activeSidebarItem === 'starred') return !!starredAnnouncements[a.id];
-      if (activeSidebarItem === 'sent') return a.author === 'You';
+      if (activeSidebarItem === 'sent') return a.author === 'admin001';
       if (activeSidebarItem === 'draft') return a.title.includes('Draft');
       return true;
     })
@@ -94,8 +121,8 @@ export default function AnnouncementPage() {
             <Mail size={16} className="mr-2" /> Compose
           </button>
           {[
-            { key: 'inbox', icon: Mail, label: 'Inbox', count: announcements.filter(a => a.author !== 'You').length },
-            { key: 'sent', icon: SendIcon, label: 'Sent', count: announcements.filter(a => a.author === 'You').length },
+            { key: 'inbox', icon: Mail, label: 'Inbox', count: announcements.filter(a => a.author !== 'admin001').length },
+            { key: 'sent', icon: SendIcon, label: 'Sent', count: announcements.filter(a => a.author === 'admin001').length },
             { key: 'draft', icon: FileText, label: 'Draft', count: announcements.filter(a => a.title.includes('Draft')).length },
             { key: 'starred', icon: Star, label: 'Starred', count: Object.values(starredAnnouncements).filter(Boolean).length },
           ].map(({ key, icon: Icon, label, count }) => (
@@ -112,6 +139,7 @@ export default function AnnouncementPage() {
             </div>
           ))}
         </div>
+
         {/* Content */}
         <div className="flex-1 relative">
           <div className="flex mb-4">
@@ -126,6 +154,7 @@ export default function AnnouncementPage() {
               />
             </div>
           </div>
+
           <div className="space-y-3 overflow-y-auto pr-2" style={{ maxHeight: 400 }}>
             {loading ? (
               <div className="flex justify-center py-4">
@@ -140,7 +169,7 @@ export default function AnnouncementPage() {
                   <div
                     key={a.id}
                     onClick={() => navigate(`/announcement/${a.id}`, { state: { announcement: a } })}
-                    className={`bg-blue-100 rounded-full px-4 py-3 flex items-center justify-between animate-fadeIn cursor-pointer`}
+                    className="bg-blue-100 rounded-full px-4 py-3 flex items-center justify-between animate-fadeIn cursor-pointer"
                   >
                     <div className="flex items-center w-1/3">
                       <button onClick={e => toggleStar(a.id, e)} className="mr-2">
@@ -165,7 +194,7 @@ export default function AnnouncementPage() {
           </div>
         </div>
       </div>
-      {/* Popup Compose Modal */}
+
       {showComposeForm && (
         <NewAnnouncement onClose={() => setShowComposeForm(false)} onSend={addNewAnnouncement} />
       )}

@@ -1,5 +1,4 @@
 // src/App.jsx
-import React from 'react';
 import {
   BrowserRouter as Router,
   Routes,
@@ -80,7 +79,7 @@ function App() {
             }
           />
           <Route
-            path="/courses/:code"
+            path="/courses/:sNo"
             element={
               <>
                 <NavbarCourse />
