@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import AddExamCard from "../../components/ExamAdminDashboard/AddExamCard";
 import ExamCard from "../../components/ExamAdminDashboard/ExamCard";
-import axios from "axios";
+import axios from "../../axios";
 import NavBarExam from "../../components/layout/NavBarExam";
 import SideBarExam from "../../components/layout/SideBarExam";
 import PropTypes from 'prop-types';

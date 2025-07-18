@@ -1,5 +1,6 @@
 package com.example.coderellaProject.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -30,5 +31,10 @@ public class Course {
     private String description;
 
     @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
     private List<Subject> subjects;
+
+    @ManyToMany(mappedBy = "courses")
+    @JsonIgnore
+    private List<Exam> exams;
 } 

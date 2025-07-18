@@ -30,6 +30,7 @@ import PaperSetterAssignPage from './pages/ExamAdministrator/PaperSetterAssignPa
 import PaperSetterListPage from './pages/ExamAdministrator/PaperSetterListPage';
 import UploadedPapersPage from './pages/ExamAdministrator/UploadedPapersPage';
 import UploadedPaperDetail from './pages/ExamAdministrator/UploadedPaperDetail';
+import AssignedCourses from './pages/ExamAdministrator/AssignedCourses.jsx';
 
 function App() {
   return (
@@ -51,6 +52,8 @@ function App() {
         <Route path="/exam-management/:examId/course/:courseId/papersetters" element={<PaperSetterListPage />} />
         <Route path="/uploaded-papers" element={<UploadedPapersPage />} />
         <Route path="/uploaded-paper-detail" element={<UploadedPaperDetail />} />
+        <Route path="/assigned-courses" element={<AssignedCourses />} />
+        <Route path="/subject-details/:courseId" element={<SubjectDetailsPage />} />
           
        
         <Route path="/signup" element={<SignupPage />} />

@@ -1,26 +1,10 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { useNavigate } from 'react-router-dom';
 import NavBarExam from '../../components/layout/NavBarExam';
 import SideBarExam from '../../components/layout/SideBarExam';
 import { MoreVertical, Plus } from 'lucide-react';
-
-const mockExam = {
-  id: 1,
-  title: 'Technical College Final Examination',
-  year: 2024,
-};
-
-const mockCourses = [
-  { id: 1, code: 'ETC_05', name: 'Engineering Draughtsmanship', assigned: true },
-  { id: 2, code: 'A01S003F4.3', name: 'Field Assistant (Agriculture)', assigned: true },
-  { id: 3, code: '45A01T03F6.1', name: 'Agriculture Production Technology', assigned: false },
-  { id: 4, code: '3D15T001P5.1', name: 'Food Technology', assigned: false },
-  { id: 5, code: 'A01S018F4.0', name: 'Plant Tissue Culture Laboratory Assistant', assigned: false },
-  { id: 6, code: '5O5S001F5.2', name: 'Automobile Air CC', assigned: false },
-  { id: 7, code: 'A01S003F4.3', name: 'Field Assistant', assigned: false },
-  { id: 8, code: 'G5O5O06F3.3', name: 'Motorcycle Mechanic', assigned: false },
-];
+import axios from '../../axios';
 
 function Toast({ message, type, onClose }) {
   if (!message) return null;
@@ -39,11 +23,30 @@ Toast.propTypes = {
 
 export default function ExamCourses() {
   const [search, setSearch] = useState('');
-  const [courses, setCourses] = useState(mockCourses);
+  const [courses, setCourses] = useState([]);
+  const [assigned, setAssigned] = useState([]); // array of course ids
   const [showAdd, setShowAdd] = useState(false);
   const [toast, setToast] = useState({ message: '', type: 'success' });
-  const [menuOpen, setMenuOpen] = useState(null); // course id for open menu
+  const [menuOpen, setMenuOpen] = useState(null);
+  const [exams, setExams] = useState([]);
+  const [selectedExam, setSelectedExam] = useState(null);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    axios.get('/exams').then(res => {
+      setExams(res.data);
+      if (res.data.length > 0) setSelectedExam(res.data[0]);
+    });
+    axios.get('/courses').then(res => setCourses(res.data));
+  }, []);
+
+  useEffect(() => {
+    if (selectedExam) {
+      axios.get(`/exams/${selectedExam.id}/courses`).then(res => {
+        setAssigned(res.data.map(c => c.id));
+      });
+    }
+  }, [selectedExam]);
 
   const showToast = (message, type = 'success') => {
     setToast({ message, type });
@@ -51,22 +54,45 @@ export default function ExamCourses() {
   };
 
   const handleAssign = (id) => {
-    setCourses(courses.map(c => c.id === id ? { ...c, assigned: true } : c));
+    setAssigned(prev => [...prev, id]);
     showToast('Course assigned!', 'success');
   };
   const handleCancel = (id) => {
-    setCourses(courses.map(c => c.id === id ? { ...c, assigned: false } : c));
+    setAssigned(prev => prev.filter(cid => cid !== id));
     showToast('Assignment cancelled.', 'success');
   };
   const handleAddCourse = (e) => {
     e.preventDefault();
-    setShowAdd(false);
-    showToast('Course added!', 'success');
+    const form = e.target;
+    const code = form.code.value;
+    const name = form.name.value;
+    axios.post('/courses', { code, name }).then(res => {
+      setCourses(prev => [...prev, res.data]);
+      setShowAdd(false);
+      showToast('Course added!', 'success');
+    }).catch(() => showToast('Failed to add course', 'error'));
   };
   const filteredCourses = courses.filter(c =>
     c.name.toLowerCase().includes(search.toLowerCase()) ||
     c.code.toLowerCase().includes(search.toLowerCase())
   );
+
+  const handleConfirm = () => {
+    if (!selectedExam) return;
+    axios.post(`/exams/${selectedExam.id}/courses`, assigned)
+      .then(() => {
+        // Fetch assigned course objects for AssignedCourses page
+        const assignedCourses = courses.filter(c => assigned.includes(c.id));
+        localStorage.setItem('assignedCourses', JSON.stringify(assignedCourses));
+        localStorage.setItem('selectedExam', JSON.stringify(selectedExam));
+        navigate('/assigned-courses');
+      })
+      .catch(() => showToast('Failed to assign courses', 'error'));
+  };
+  const handleCancelAll = () => {
+    setAssigned([]);
+    showToast('All assignments cancelled.', 'success');
+  };
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-100">
@@ -76,9 +102,20 @@ export default function ExamCourses() {
         <main className="flex-1 p-8" style={{ marginLeft: '18rem', marginTop: '5.5rem' }}>
           <div className="bg-white rounded-2xl shadow-lg p-8">
             <div className="flex items-center justify-between mb-6">
-              <h1 className="text-2xl font-bold text-gray-800">
-                {mockExam.title} - {mockExam.year}
-              </h1>
+              <div className="flex items-center gap-4">
+                <select
+                  className="border rounded px-4 py-2"
+                  value={selectedExam ? selectedExam.id : ''}
+                  onChange={e => {
+                    const exam = exams.find(ex => ex.id === Number(e.target.value));
+                    setSelectedExam(exam);
+                  }}
+                >
+                  {exams.map(exam => (
+                    <option key={exam.id} value={exam.id}>{exam.title} - {exam.year}</option>
+                  ))}
+                </select>
+              </div>
               <button
                 className="flex items-center gap-2 bg-blue-900 text-white px-6 py-2 rounded-full font-semibold hover:bg-blue-800 transition"
                 onClick={() => setShowAdd(true)}
@@ -119,17 +156,17 @@ export default function ExamCourses() {
                       key={course.id}
                       className="border-b last:border-b-0"
                       onDoubleClick={() => {
-                        if (course.assigned) {
-                          navigate(`/exam-management/${mockExam.id}/course/${course.id}`);
+                        if (assigned.includes(course.id)) {
+                          navigate(`/subject-details/${course.id}`);
                         }
                       }}
-                      style={{ cursor: course.assigned ? 'pointer' : 'default' }}
+                      style={{ cursor: assigned.includes(course.id) ? 'pointer' : 'default' }}
                     >
                       <td className="p-3">{idx + 1}</td>
                       <td className="p-3 font-mono">{course.code}</td>
                       <td className="p-3">{course.name}</td>
                       <td className="p-3 flex items-center gap-2 relative">
-                        {course.assigned ? (
+                        {assigned.includes(course.id) ? (
                           <button
                             className="bg-gray-200 text-gray-700 px-4 py-1 rounded-full text-sm font-semibold hover:bg-gray-300"
                             onClick={() => handleCancel(course.id)}
@@ -176,6 +213,21 @@ export default function ExamCourses() {
                   )}
                 </tbody>
               </table>
+            </div>
+            <div className="flex justify-end gap-4 mt-8">
+              <button
+                className="px-6 py-2 rounded bg-gray-300 text-gray-700 font-semibold hover:bg-gray-400"
+                onClick={handleCancelAll}
+              >
+                Cancel
+              </button>
+              <button
+                className="px-6 py-2 rounded bg-blue-700 text-white font-semibold hover:bg-blue-800"
+                onClick={handleConfirm}
+                disabled={assigned.length === 0}
+              >
+                Confirm
+              </button>
             </div>
           </div>
           {/* Add Course Modal */}

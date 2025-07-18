@@ -1,9 +1,11 @@
 package com.example.coderellaProject.controller;
 
 import com.example.coderellaProject.model.Exam;
+import com.example.coderellaProject.model.Course;
 import com.example.coderellaProject.service.ExamService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.beans.factory.annotation.Autowired;
 import java.util.List;
 
 @RestController
@@ -12,6 +14,8 @@ import java.util.List;
 public class ExamController {
 
     private final ExamService examService;
+    @Autowired
+    private com.example.coderellaProject.service.CourseService courseService;
 
     public ExamController(ExamService examService) {
         this.examService = examService;
@@ -57,5 +61,23 @@ public class ExamController {
     @GetMapping("/search")
     public List<Exam> searchExams(@RequestParam String keyword) {
         return examService.searchExams(keyword);
+    }
+
+    // Get courses assigned to an exam
+    @GetMapping("/{examId}/courses")
+    public List<Course> getCoursesForExam(@PathVariable Long examId) {
+        return examService.getCoursesForExam(examId);
+    }
+
+    // Assign courses to an exam (replace all assignments)
+    @PostMapping("/{examId}/courses")
+    public List<Course> assignCoursesToExam(@PathVariable Long examId, @RequestBody List<Long> courseIds) {
+        return examService.assignCoursesToExam(examId, courseIds);
+    }
+
+    // Remove a course from an exam
+    @DeleteMapping("/{examId}/courses/{courseId}")
+    public void removeCourseFromExam(@PathVariable Long examId, @PathVariable Long courseId) {
+        examService.removeCourseFromExam(examId, courseId);
     }
 }
