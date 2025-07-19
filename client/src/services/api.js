@@ -8,6 +8,12 @@ const api = axios.create({
     },
 });
 
+export const getUsers = async () => {
+    const response = await api.get('/users'); 
+    return response.data;
+};
+
+
 // Paper Setter API calls
 export const paperSetterAPI = {
     getAll: () => api.get('/paper-setters'),
