@@ -1,23 +1,41 @@
 package com.example.coderellaProject.model;
-import jakarta.persistence.*;
-import lombok.Data;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Set;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.ElementCollection;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.Lob;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.Table;
+import lombok.Data;
 
 @Entity
 @Data
 @Table(name = "users")
 public class User {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    private String registrationId;
 
     @Column(unique = true)
     private String username;
 
     @Column(unique = true)
     private String email;
+
     private String password;
 
     private String firstname;
@@ -42,10 +60,11 @@ public class User {
     private String bankName;
     private String branch;
 
-    private boolean isActive = false;  // For approval by SUPER_ADMIN
-    private boolean isProfileCompleted = false;  // After user submits full profile
+    private boolean isActive = false;
+    private boolean isProfileCompleted = false;
+    
     @Column(nullable = false)
-    private boolean firstLogin = false; // default false, only true for users created by admin
+    private boolean firstLogin = false;
 
     @Lob
     @Column(columnDefinition = "LONGBLOB")
@@ -54,5 +73,13 @@ public class User {
     @Enumerated(EnumType.STRING)
     private Role role;
 
-    private String resetToken;// Added for forgot password functionality
+    private String resetToken;
+
+    @ManyToMany
+    @JoinTable(
+        name = "subject_assignments",
+        joinColumns = @JoinColumn(name = "user_id"),
+        inverseJoinColumns = @JoinColumn(name = "subject_id")
+    )
+    private Set<PapersetterSubject> subjects;
 }
