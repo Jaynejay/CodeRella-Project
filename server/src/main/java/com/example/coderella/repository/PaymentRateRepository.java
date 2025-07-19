@@ -1,12 +1,13 @@
 package com.example.coderella.repository;
 
-import com.example.coderella.entity.PaymentRate;
+import java.util.List;
+import java.util.Optional;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
-import java.util.Optional;
-import java.util.List;
+import com.example.coderella.entity.PaymentRate;
 
 
 @Repository
@@ -17,13 +18,13 @@ public interface PaymentRateRepository extends JpaRepository<PaymentRate, Long> 
     Optional<PaymentRate> findByCourseCodeAndSubjectCodeAndDuration(String courseCode, String subjectCode, Integer duration);
 
     @Query("SELECT DISTINCT p.courseCode FROM PaymentRate p")
-List<String> findDistinctCourseCodes();
+    List<String> findDistinctCourseCodes();
 
-@Query("SELECT DISTINCT p.subjectCode FROM PaymentRate p")
-List<String> findDistinctSubjectCodes();
+    @Query("SELECT DISTINCT p.subjectCode FROM PaymentRate p")
+    List<String> findDistinctSubjectCodes();
 
-@Query("SELECT DISTINCT p.duration FROM PaymentRate p")
-List<Integer> findDistinctDurations();
+    @Query("SELECT DISTINCT p.duration FROM PaymentRate p")
+    List<Integer> findDistinctDurations();
 
 
 }
