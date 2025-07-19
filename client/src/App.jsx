@@ -85,10 +85,7 @@ function App() {
           <Route path="/admin/pending" element={<PendingRequests />} />
           <Route path="/admin/paper-setters" element={<PaperSetterPage />} />
           <Route path="/admin/exam-admins" element={<ExamAdminPage />} />
-          <Route
-            path="/admin/payment-coordinators"
-            element={<PaymentCoordinatorPage />}
-          />
+          <Route path="/admin/payment-coordinators" element={<PaymentCoordinatorPage />} />
           <Route path="/admin/course-admins" element={<CourseAdminPage />} />
           <Route path="/admin/create" element={<CreateUserPage />} />
 
@@ -103,68 +100,20 @@ function App() {
           <Route path="/paperSetter" element={<PaperSetterList />} />
 
           {/* Dashboard */}
-          <Route
-            path="/dashboard"
-            element={
-              <>
-                <NavbarCourse />
-                <Dashboard />
-              </>
-            }
-          />
+          <Route path="/dashboard" element={<><NavbarCourse /><Dashboard /></>} />
 
           {/* Courses */}
-          <Route
-            path="/courses"
-            element={
-              <>
-                <NavbarCourse />
-                <CourseOverview />
-              </>
-            }
-          />
-          <Route
-            path="/courses/:code"
-            element={
-              <>
-                <NavbarCourse />
-                <SubjectOverview />
-              </>
-            }
-          />
+          <Route path="/courses" element={<><NavbarCourse /><CourseOverview /></>} />
+          <Route path="/courses/:code" element={<><NavbarCourse /><SubjectOverview /></>} />
           <Route path="/subjects/:id" element={<SubjectOverview />} />
 
           {/* Announcements */}
-          <Route
-            path="/announcements"
-            element={
-              <>
-                <NavbarCourse />
-                <AnnouncementPage />
-              </>
-            }
-          />
-          <Route
-            path="/announcement/:id"
-            element={
-              <>
-                <NavbarCourse />
-                <AnnouncementDetail />
-              </>
-            }
-          />
+          <Route path="/announcements" element={<><NavbarCourse /><AnnouncementPage /></>} />
+          <Route path="/announcement/:id" element={<><NavbarCourse /><AnnouncementDetail /></>} />
           <Route path="/announcement" element={<AnnouncementPage />} />
 
           {/* Admin Subject Detail */}
-          <Route
-            path="/adminsubject-detail/:id"
-            element={
-              <>
-                <NavbarCourse />
-                <AdminSubjectDetail />
-              </>
-            }
-          />
+          <Route path="/adminsubject-detail/:id" element={<><NavbarCourse /><AdminSubjectDetail /></>} />
 
           {/* User Dashboard */}
           <Route path="/userdashboard" element={<DashboardUser />} />
@@ -172,46 +121,12 @@ function App() {
           <Route path="/subject/:id" element={<SubjectDetail />} />
 
           {/* User Announcements */}
-          <Route
-            path="/userannouncements"
-            element={
-              <>
-                <NavbarUser />
-                <AnnouncementsUser />
-              </>
-            }
-          />
-          <Route
-            path="/userannouncements/:id"
-            element={
-              <>
-                <NavbarUser />
-                <AnnDetailUser />
-              </>
-            }
-          />
+          <Route path="/userannouncements" element={<><NavbarUser /><AnnouncementsUser /></>} />
+          <Route path="/userannouncements/:id" element={<><NavbarUser /><AnnDetailUser /></>} />
 
           {/* Modals (as routes) */}
-          <Route
-            path="/adding-course"
-            element={
-              <AddingCourse
-                isOpen={true}
-                onClose={() => {}}
-                onSubmit={() => {}}
-              />
-            }
-          />
-          <Route
-            path="/delete-course"
-            element={
-              <DeleteCourse
-                isOpen={true}
-                onClose={() => {}}
-                onDelete={() => {}}
-              />
-            }
-          />
+          <Route path="/adding-course" element={<AddingCourse isOpen={true} onClose={() => {}} onSubmit={() => {}} />} />
+          <Route path="/delete-course" element={<DeleteCourse isOpen={true} onClose={() => {}} onDelete={() => {}} />} />
           <Route path="/update-course" element={<UpdateCourse />} />
           <Route path="/add-subject" element={<AddSubject />} />
           <Route path="/update-subject" element={<UpdateSubject />} />
@@ -229,28 +144,13 @@ function App() {
           {/* Exam Management */}
           <Route path="/exam-management" element={<ExamManagement2 />} />
           <Route path="/exam-management/:examId" element={<ExamCourses />} />
-          <Route
-            path="/exam-management/:examId/course/:courseId"
-            element={<SubjectDetailsPage />}
-          />
-          <Route
-            path="/exam-management/:examId/course/:courseId/papersetter/:papersetterId/assign"
-            element={<PaperSetterAssignPage />}
-          />
-          <Route
-            path="/exam-management/:examId/course/:courseId/papersetters"
-            element={<PaperSetterListPage />}
-          />
+          <Route path="/exam-management/:examId/course/:courseId" element={<SubjectDetailsPage />} />
+          <Route path="/exam-management/:examId/course/:courseId/papersetter/:papersetterId/assign" element={<PaperSetterAssignPage />} />
+          <Route path="/exam-management/:examId/course/:courseId/papersetters" element={<PaperSetterListPage />} />
           <Route path="/uploaded-papers" element={<UploadedPapersPage />} />
-          <Route
-            path="/uploaded-paper-detail"
-            element={<UploadedPaperDetail />}
-          />
+          <Route path="/uploaded-paper-detail" element={<UploadedPaperDetail />} />
           <Route path="/assigned-courses" element={<AssignedCourses />} />
-          <Route
-            path="/subject-details/:courseId"
-            element={<SubjectDetailsPage />}
-          />
+          <Route path="/subject-details/:courseId" element={<SubjectDetailsPage />} />
         </Routes>
       </Router>
     </div>
