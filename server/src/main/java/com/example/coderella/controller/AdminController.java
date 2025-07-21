@@ -1,12 +1,12 @@
 package com.example.coderella.controller;
 
 import com.example.coderella.dto.AdminUserCreationRequest;
-import com.example.coderellaProject.dto.AdminUserUpdateRequest;
+import com.example.coderella.dto.AdminUserUpdateRequest;
 import com.example.coderella.entity.Role;
 import com.example.coderella.entity.User;
 import com.example.coderella.repository.UserRepository;
-import com.example.coderellaProject.dto.UserSummaryDto;
-import com.example.coderellaProject.service.UserService;
+import com.example.coderella.dto.UserSummaryDto;
+import com.example.coderella.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
