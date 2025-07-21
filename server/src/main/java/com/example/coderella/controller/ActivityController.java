@@ -17,13 +17,13 @@ public class ActivityController {
     private final ActivityService activityService;
 
     @GetMapping
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('SUPER_ADMIN')")
     public List<Activity> getAllActivities() {
         return activityService.getAllActivities();
     }
 
     @GetMapping("/{username}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('SUPER_ADMIN')")
     public List<Activity> getActivitiesByUsername(@PathVariable String username) {
         return activityService.getActivitiesByUsername(username);
     }
