@@ -243,7 +243,7 @@ function App() {
 
           {/* File Upload */}
           <Route path="/upload" element={<FileUploadPage />} />
-          {/* <Route path="/addsubmission" element={<AddSubmissionPage />} /> */}
+          <Route path="/addsubmission" element={<AddSubmissionPage />} /> 
           <Route path="/examdates" element={<ExamDates />} />
 
           {/* Exam Management */}
