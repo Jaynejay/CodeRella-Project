@@ -80,6 +80,10 @@ public class PasswordResetController {
         User user = userRepository.findByEmail(resetToken.getEmail())
                 .orElseThrow(() -> new RuntimeException("User not found."));
 
+        if (passwordEncoder.matches(request.getNewPassword(), user.getPassword())) {
+            return ResponseEntity.badRequest().body("New password must be different from the old password.");
+        }
+
         user.setPassword(passwordEncoder.encode(request.getNewPassword()));
         user.setFirstLogin(false);
         userRepository.save(user);
