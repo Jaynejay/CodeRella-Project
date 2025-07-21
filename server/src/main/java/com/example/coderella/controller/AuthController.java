@@ -6,7 +6,7 @@ import com.example.coderella.entity.Role;
 import com.example.coderella.entity.User;
 import com.example.coderella.repository.UserRepository;
 import com.example.coderella.service.ActivityService;
-import com.example.coderellaProject.service.JwtBlacklistService;
+import com.example.coderella.service.JwtBlacklistService;
 import com.example.coderella.util.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
