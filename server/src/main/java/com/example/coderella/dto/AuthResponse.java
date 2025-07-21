@@ -12,6 +12,6 @@ public class AuthResponse {
     private boolean active;
     private boolean profileCompleted;
     private boolean firstLogin;
-
+    private boolean scheduledForDeletion;
 
 }
