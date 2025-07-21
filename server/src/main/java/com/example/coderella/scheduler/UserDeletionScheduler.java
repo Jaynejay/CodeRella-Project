@@ -1,7 +1,7 @@
-package com.example.coderellaProject.scheduler;
+package com.example.coderella.scheduler;
 
-import com.example.coderellaProject.model.User;
-import com.example.coderellaProject.repository.UserRepository;
+import com.example.coderella.entity.User;
+import com.example.coderella.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
