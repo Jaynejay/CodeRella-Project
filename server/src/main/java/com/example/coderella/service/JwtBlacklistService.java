@@ -1,5 +1,5 @@
 // JwtBlacklistService.java
-package com.example.coderellaProject.service;
+package com.example.coderella.service;
 
 import org.springframework.stereotype.Service;
 
