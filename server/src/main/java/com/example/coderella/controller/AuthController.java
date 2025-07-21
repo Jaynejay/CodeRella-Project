@@ -6,6 +6,7 @@ import com.example.coderella.entity.Role;
 import com.example.coderella.entity.User;
 import com.example.coderella.repository.UserRepository;
 import com.example.coderella.service.ActivityService;
+import com.example.coderellaProject.service.JwtBlacklistService;
 import com.example.coderella.util.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +32,9 @@ public class AuthController {
     @Autowired private JwtUtil jwtUtil;
     @Autowired private UserRepository userRepository;
     @Autowired private PasswordEncoder passwordEncoder;
+
+     @Autowired
+    private JwtBlacklistService jwtBlacklistService;
 
     @PostMapping("/signup")
     public ResponseEntity<String> signup(@RequestParam String email,
@@ -67,7 +71,7 @@ public class AuthController {
         );
         User user = userRepository.findByUsername(request.getUsername());
 
-        // ✅ Log the activity
+        // Log the activity
         activityService.logActivity(
                 user.getUsername(),
                 "LOGIN",
@@ -75,7 +79,19 @@ public class AuthController {
         );
 
         String token = jwtUtil.generateToken(user);
-        return ResponseEntity.ok(new AuthResponse(token, user.getRole().name(), user.getUsername(),user.isActive(),user.isProfileCompleted(),user.isFirstLogin()));
+        return ResponseEntity.ok(new AuthResponse(token, user.getRole().name(), user.getUsername(),user.isActive(),user.isProfileCompleted(),user.isFirstLogin(),user.isScheduledForDeletion()));
+    }
+
+    // AuthController.java
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout(@RequestHeader("Authorization") String authHeader) {
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            String token = authHeader.substring(7); // remove "Bearer "
+            jwtBlacklistService.blacklistToken(token);
+            return ResponseEntity.ok("Logged out successfully");
+        } else {
+            return ResponseEntity.badRequest().body("Invalid Authorization header");
+        }
     }
 
 
