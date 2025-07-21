@@ -1,5 +1,6 @@
 package com.example.coderella.entity;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
 
@@ -64,6 +65,12 @@ public class User {
     
     @Column(nullable = false)
     private boolean firstLogin = false;
+
+    @Column(name = "scheduled_for_deletion")
+    private boolean scheduledForDeletion = false;
+
+    @Column(name = "deletion_scheduled_at")
+    private LocalDateTime deletionScheduledAt;
 
     @Lob
     @Column(columnDefinition = "LONGBLOB")
