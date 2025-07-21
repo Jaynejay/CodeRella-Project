@@ -2,21 +2,18 @@ package com.example.coderella.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
+
 import java.util.List;
 
 @Getter
 @Setter
-@Entity
-@Table(name = "courses")
-@Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Entity
+@Table(name = "exam_courses")
 public class ExamCourse {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -30,11 +27,12 @@ public class ExamCourse {
     @Column
     private String description;
 
-    @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    // Map ExamSubjects, not Subjects
+    @OneToMany(mappedBy = "examCourse", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonIgnore
-    private List<Subject> subjects;
+    private List<ExamSubject> subjects;
 
     @ManyToMany(mappedBy = "courses")
     @JsonIgnore
     private List<Exam> exams;
-} 
+}

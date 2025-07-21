@@ -19,11 +19,15 @@ public class Course {
     /** Business-level S. No., unique and unmodifiable */
     @NotNull
     @Column(name = "s_no", nullable = false, unique = true)
-    private Long sNo;
+    private Long SNo;
 
     @NotBlank
     @Column(nullable = false)
     private String code;
+
+    @NotBlank
+    @Column(nullable = false)
+    private String name;
 
     @NotBlank
     @Column(nullable = false)

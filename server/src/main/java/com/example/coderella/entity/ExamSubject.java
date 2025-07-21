@@ -1,20 +1,16 @@
 package com.example.coderella.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 @Getter
 @Setter
-@Entity
-@Table(name = "ExamSubjects")
-@Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Entity
+@Table(name = "exam_subjects")
 public class ExamSubject {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -28,7 +24,8 @@ public class ExamSubject {
     @Column
     private String description;
 
+    // Correct relation to ExamCourse
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "course_id")
-    private Course course;
+    @JoinColumn(name = "exam_course_id")
+    private ExamCourse examCourse;
 }

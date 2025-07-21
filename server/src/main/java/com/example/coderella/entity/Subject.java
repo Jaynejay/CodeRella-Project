@@ -1,17 +1,18 @@
-
 package com.example.coderella.entity;
+
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.ArrayList;
-import java.util.List;
-
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
-@Table(name ="subjects" )
-@Getter @Setter
-@NoArgsConstructor @AllArgsConstructor
+@Table(name = "subjects")
 public class Subject {
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(nullable = false, unique = true)
@@ -29,9 +30,4 @@ public class Subject {
 
     @Column(name = "cover_path")
     private String coverPath;
-
-  //  @OneToMany(mappedBy = "subject")
-   // private List<PaperSetterSubjectAccess> accesses = new ArrayList<>();
-
-    // Constructors, getters & setters unchanged
 }

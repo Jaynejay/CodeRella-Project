@@ -36,9 +36,10 @@ public class ExamSubjectController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
+    // Updated method call here
     @GetMapping("/course/{courseId}")
     public List<ExamSubject> getSubjectsByCourseId(@PathVariable Long courseId) {
-        return subjectService.getSubjectsByCourseId(courseId);
+        return subjectService.getSubjectsByExamCourseId(courseId);
     }
 
     @PostMapping
@@ -71,8 +72,9 @@ public class ExamSubjectController {
         return subjectService.searchSubjects(keyword);
     }
 
+    // Updated method call here
     @GetMapping("/course/{courseId}/search")
     public List<ExamSubject> searchSubjectsByCourse(@PathVariable Long courseId, @RequestParam String keyword) {
-        return subjectService.searchSubjectsByCourse(courseId, keyword);
+        return subjectService.searchSubjectsByExamCourse(courseId, keyword);
     }
 }
