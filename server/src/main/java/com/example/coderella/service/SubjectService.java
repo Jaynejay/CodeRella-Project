@@ -44,7 +44,8 @@ public class SubjectService {
                 String fileName = System.currentTimeMillis() + "_" + dto.getImage().getOriginalFilename();
 
                 // ✅ Use your exact folder path
-                String uploadDir = "C:/Users/DELL/OneDrive/Desktop/Backend/coderellaProject/uploads/subject_covers/";
+
+                String uploadDir = "C:/Users/DELL/OneDrive/Desktop/New/new/CodeRella-Project/server/uploads/subject_covers/";
                 Path uploadPath = Paths.get(uploadDir);
 
                 if (!Files.exists(uploadPath)) {

@@ -22,12 +22,10 @@ export default function Dashboard() {
   useEffect(() => {
     const base = 'http://localhost:8080/api'
 
-    // ✅ 1) Recently accessed subjects
     axios.get(`${base}/recent-subjects`)
       .then(res => setRecentSubjects(res.data))
       .catch(console.error)
 
-    // 2) Calendar events
     axios.get(`${base}/events?managerId=${managerId}`)
       .then(res => {
         setEvents(res.data.map(e => ({
@@ -38,12 +36,10 @@ export default function Dashboard() {
       })
       .catch(console.error)
 
-    // 3) manager-created announcements
     axios.get(`${base}/announcements`)
       .then(res => setAnnouncements(res.data))
       .catch(console.error)
 
-    // 4) notifications delivered to this user
     axios.get(`${base}/papersetter/announcements?paperSetterId=${managerId}`)
       .then(res => setPSNotifications(res.data))
       .catch(console.error)
@@ -67,16 +63,22 @@ export default function Dashboard() {
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 mb-8">
               {recentSubjects.map(s => (
                 <Link
-                  key={s.id}
-                  to={`/subjects/${s.id}`}
+                  key={s.code}
+                  to={`/subjects/${s.code}`}
                   className="block overflow-hidden rounded-lg shadow hover:shadow-md border"
                 >
                   <div className="relative aspect-video">
-                    <img
-                      src={s.coverPath || '/placeholder.jpg'}
-                      alt={s.title}
-                      className="object-cover w-full h-full"
-                    />
+                    {s.coverPath ? (
+                      <img
+                        src={`http://localhost:8080/uploads/subject_covers/${s.coverPath}`}
+                        alt={s.title}
+                        className="w-full h-32 object-cover rounded-md"
+                      />
+                    ) : (
+                      <div className="w-full h-32 bg-gray-200 flex items-center justify-center text-gray-500">
+                        No Image
+                      </div>
+                    )}
                     <span className="absolute top-2 left-2 bg-blue-800 text-white text-xs px-2 py-0.5 rounded">
                       {s.level}
                     </span>
