@@ -36,8 +36,13 @@ public class SecurityConfig {
                 .cors(cors -> {}) // this allows your global config to take effect
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-            .anyRequest().permitAll()  // Allow all requests temporarily
-        )
+                        .requestMatchers(
+                                "/api/auth/**",
+                                "/api/auth/request-password-reset"
+
+                        ).permitAll()
+                        .anyRequest().authenticated()
+                )
                 .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
