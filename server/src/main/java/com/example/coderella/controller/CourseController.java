@@ -13,9 +13,8 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/courses")
-@CrossOrigin(origins = "http://localhost:5173")
+@CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
 public class CourseController {
-
     private final CourseService service;
 
     public CourseController(CourseService service) {
@@ -23,41 +22,46 @@ public class CourseController {
     }
 
     @GetMapping
-    public List<Course> list() {
+    public List<Course> listAll() {
         return service.listAll();
+    }
+
+    @GetMapping("/recent")
+    public List<Course> recent() {
+        return service.findRecentCourses();
     }
 
     @GetMapping("/{sNo}")
     public ResponseEntity<Course> getOne(@PathVariable Long sNo) {
-        Course c = service.getBySNo(sNo);
-        return ResponseEntity.ok(c);
+        try {
+            return ResponseEntity.ok(service.getBySNo(sNo));
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 
-    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping
     public ResponseEntity<Course> create(@ModelAttribute CourseDto dto) throws IOException {
-        Course saved = service.createCourse(dto);
-        return ResponseEntity.status(HttpStatus.CREATED).body(saved);
+        Course created = service.createCourse(dto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
-    @PutMapping(path = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PutMapping("/{sNo}")
     public ResponseEntity<Course> update(
-            @PathVariable Long id,
-            @ModelAttribute CourseDto dto) throws IOException {
-        Course updated = service.updateCourse(id, dto);
-        return ResponseEntity.ok(updated);
+            @PathVariable Long sNo,
+            @ModelAttribute CourseDto dto
+    ) throws IOException {
+        try {
+            Course updated = service.updateCourse(sNo, dto);
+            return ResponseEntity.ok(updated);
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @DeleteMapping("/{sNo}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable Long sNo) {
         service.deleteBySNo(sNo);
-    }
-
-    @GetMapping(path = "/{sNo}/image", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
-    public ResponseEntity<byte[]> image(@PathVariable Long sNo) {
-        Course c = service.getBySNo(sNo);
-        return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_TYPE, c.getImageType())
-                .body(c.getImageData());
     }
 }

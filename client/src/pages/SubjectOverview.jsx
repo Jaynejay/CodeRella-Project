@@ -1,5 +1,4 @@
-// src/pages/SubjectOverview.jsx
-import { useEffect, useState }  from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 
@@ -11,50 +10,65 @@ import DeleteSubject  from './DeleteSubject';
 const baseUrl = 'http://localhost:8080/api';
 
 export default function SubjectOverview() {
-  const { sNo: courseId } = useParams();       //   “code” route-param is really the course Id
-  const navigate           = useNavigate();
+  const { sNo: courseId } = useParams();  // from route param /courses/:sNo
+  const navigate = useNavigate();
 
-  /* ------------------------------------------------------------------ state */
   const [courseTitle, setCourseTitle] = useState('');
   const [courseLevel, setCourseLevel] = useState('');
   const [courseCode,  setCourseCode]  = useState('');
-
-
   const [subjects,    setSubjects]    = useState([]);
+  const [allSubjects, setAllSubjects] = useState([]);
 
   const [showAdd,    setShowAdd]    = useState(false);
   const [showUpdate, setShowUpdate] = useState(false);
   const [showDelete, setShowDelete] = useState(false);
   const [selected,   setSelected]   = useState(null);
 
-  /* ------------------------------------------------------------- load data */
-  /** fetch course (for title) + subjects list - get*/
-  const fetchSubjects = async () => {
+  // ✅ useCallback to fix hook dependency warning
+  const fetchSubjects = useCallback(async () => {
+    if (!courseId) {
+      alert("Invalid course ID");
+      return;
+    }
+
     try {
       const [courseRes, subjRes] = await Promise.all([
         axios.get(`${baseUrl}/courses/${courseId}`),
         axios.get(`${baseUrl}/courses/${courseId}/subjects`)
       ]);
       setCourseTitle(courseRes.data.title);
-       setCourseCode( courseRes.data.code );
-       setCourseLevel(courseRes.data.level);        
-      setSubjects(subjRes.data);                //  [{id,code,title,…}, …]
+      setCourseCode(courseRes.data.code);
+      setCourseLevel(courseRes.data.level);
+      setSubjects(subjRes.data);
+      setAllSubjects(subjRes.data);
     } catch (err) {
       console.error(err);
       alert('Failed to load subjects');
     }
+  }, [courseId]);
+
+  useEffect(() => {
+    console.log("courseId from route:", courseId);
+    fetchSubjects();
+  }, [fetchSubjects]);
+
+//   useEffect(() => {
+//   if (courseId) {
+//     axios.post(`http://localhost:8080/api/recent-courses/${courseId}`)
+//          .catch(console.error);
+//   }
+// }, [courseId]);
+
+  const handleSearch = (e) => {
+    const keyword = e.target.value.toLowerCase();
+    setSubjects(allSubjects.filter((s) =>
+      s.title.toLowerCase().includes(keyword)
+    ));
   };
 
-  useEffect(() => { fetchSubjects(); }, [courseId]);
-  useEffect(() => {
-  console.log("fetched subjects:", subjects);
-}, [subjects]);
-
-  /* -------------------------------------------------------- CRUD handlers */
-  /** create */
   const handleAdd = async ({ subjectCode, subjectName, files }) => {
     const fd = new FormData();
-    fd.append('code',  subjectCode);
+    fd.append('code', subjectCode);
     fd.append('title', subjectName);
     if (files.length) fd.append('image', files[0]);
 
@@ -66,7 +80,6 @@ export default function SubjectOverview() {
     setShowAdd(false);
   };
 
-  /** update */
   const handleUpd = async (form) => {
     const fd = new FormData();
     fd.append('title', form.subjectName);
@@ -82,19 +95,16 @@ export default function SubjectOverview() {
     setShowUpdate(false);
   };
 
-  /** delete */
   const handleDel = async ({ subjectCode }) => {
     await axios.delete(`${baseUrl}/courses/${courseId}/subjects/${subjectCode}`);
     fetchSubjects();
     setShowDelete(false);
   };
 
-  /* ---------------------------------------------------------------- render */
   return (
     <>
       <div className="flex min-h-screen bg-gray-50 pt-24">
         <SideBarSubject title="My Subject" />
-
         <main className="flex-1 px-6">
           <section className="mx-auto max-w-5xl">
             <h1 className="mb-4 text-2xl font-semibold">Subject Overview</h1>
@@ -102,21 +112,14 @@ export default function SubjectOverview() {
               {courseCode} – {courseTitle || '…'}
             </p>
 
-            {/* top-bar ----------------------------------------------------- */}
+            {/* Top bar */}
             <div className="mb-6 flex items-center justify-between">
               <div className="relative w-64">
                 <input
                   type="text"
                   placeholder="Search subject"
                   className="w-full rounded-full bg-gray-200/60 pl-10 pr-4 py-2 text-sm focus:outline-none"
-                  /* optional client-side search filter */
-                  onChange={(e) =>
-                    setSubjects((prev) =>
-                      prev.filter((s) =>
-                        s.title.toLowerCase().includes(e.target.value.toLowerCase())
-                      )
-                    )
-                  }
+                  onChange={handleSearch}
                 />
                 <svg className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-blue-900"
                      xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
@@ -132,11 +135,11 @@ export default function SubjectOverview() {
               </button>
             </div>
 
-            {/* list -------------------------------------------------------- */}
+            {/* Subject list */}
             <div className="rounded-xl bg-white p-6 shadow-inner ring-1 ring-gray-200 max-h-[60vh] overflow-y-auto">
               {subjects.map((s, idx) => (
                 <div key={s.code}
-                     onClick={() => navigate(`/subjects/${s.code}`)}
+                     onClick={() => s.code && navigate(`/subject/${s.code}`)}
                      className="group mb-3 flex items-center justify-between rounded-full bg-blue-100 px-4 py-3 last:mb-0 hover:bg-blue-200">
                   <div className="flex items-center gap-6">
                     <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-gray-200 text-xs text-gray-700">
@@ -146,7 +149,7 @@ export default function SubjectOverview() {
                     <span className="text-sm">{s.title}</span>
                   </div>
 
-                  {/* actions menu */}
+                  {/* Actions */}
                   <div className="relative shrink-0" onClick={(e) => e.stopPropagation()}>
                     <button className="rounded-full p-1 hover:bg-blue-300/40">
                       <svg viewBox="0 0 20 20" className="h-5 w-5 fill-[#0B1F7F]">
@@ -174,14 +177,14 @@ export default function SubjectOverview() {
         </main>
       </div>
 
-      {/* modals ------------------------------------------------------------ */}
+      {/* Modals */}
       {showAdd && (
         <AddSubject
           onClose={() => setShowAdd(false)}
           onSubmit={handleAdd}
           initialCourseLevel={courseLevel}
-          initialCourseName ={courseTitle}
-          initialCourseCode ={courseCode}
+          initialCourseName={courseTitle}
+          initialCourseCode={courseCode}
         />
       )}
 
@@ -190,10 +193,10 @@ export default function SubjectOverview() {
           onClose={() => setShowUpdate(false)}
           onSubmit={handleUpd}
           initialData={{
-            courseCode:  courseId,
+            courseCode: courseId,
             subjectCode: selected.code,
             subjectName: selected.title,
-            newLevel:    '',
+            newLevel: '',
             newCourseName: '',
             files: []
           }}
@@ -206,7 +209,7 @@ export default function SubjectOverview() {
           onClose={() => setShowDelete(false)}
           onDelete={handleDel}
           initialData={{
-            courseCode:  courseId,
+            courseCode: courseId,
             subjectCode: selected.code,
             subjectName: selected.title
           }}

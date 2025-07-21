@@ -56,7 +56,8 @@ const AddingCourse = ({ isOpen, onClose, onSubmit }) => {
     setSNo(""); setLevel(""); setName(""); setCode(""); setImage(null);
   };
   const handleSubmit = () => {
-    onSubmit({ sNo, level, courseName: name, courseCode: code, courseImage: image });
+    onSubmit({ sNo, level, name, code,  title: name, imageFile: image });
+
     reset();
   };
 

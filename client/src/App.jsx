@@ -123,15 +123,15 @@ function App() {
               </>
             }
           />
-          <Route
-            path="/courses/:code"
-            element={
-              <>
-                <NavbarCourse />
-                <SubjectOverview />
-              </>
-            }
-          />
+             <Route
+          path="/courses/:sNo"
+          element={
+            <>
+              <NavbarCourse />
+              <SubjectOverview />
+            </>
+          }
+        />
           <Route path="/subjects/:id" element={<SubjectOverview />} />
 
           {/* Announcements */}

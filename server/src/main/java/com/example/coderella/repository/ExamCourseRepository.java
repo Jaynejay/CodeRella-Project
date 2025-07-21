@@ -13,6 +13,6 @@ public interface ExamCourseRepository extends JpaRepository<ExamCourse, Long> {
     
     Optional<ExamCourse> findByCode(String code);
     
-    @Query("SELECT c FROM Course c WHERE c.name LIKE %:keyword% OR c.code LIKE %:keyword%")
+    @Query("SELECT c FROM Course c WHERE c.title LIKE %:keyword% OR c.code LIKE %:keyword%")
     List<ExamCourse> searchByKeyword(@Param("keyword") String keyword);
 } 

@@ -62,7 +62,7 @@ public class User {
 
     private boolean isActive = false;
     private boolean isProfileCompleted = false;
-    
+
     @Column(nullable = false)
     private boolean firstLogin = false;
 
@@ -83,9 +83,9 @@ public class User {
 
     @ManyToMany
     @JoinTable(
-        name = "subject_assignments",
-        joinColumns = @JoinColumn(name = "user_id"),
-        inverseJoinColumns = @JoinColumn(name = "subject_id")
+            name = "subject_assignments",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "subject_id")
     )
     private Set<PapersetterSubject> subjects;
 }

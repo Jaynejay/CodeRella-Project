@@ -1,5 +1,6 @@
 // File: src/main/java/com/example/coderellaProject/model/PapersetterSubject.java
 package com.example.coderella.entity;
+
 import jakarta.persistence.*;
 import java.util.Set;
 

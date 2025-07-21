@@ -2,20 +2,19 @@
 package com.example.coderella.dto;
 
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import org.springframework.web.multipart.MultipartFile;
 
 @Getter @Setter
 @NoArgsConstructor @AllArgsConstructor
 public class CourseDto {
-
-    /** Frontend-provided S. No. */
-    @NotNull
     private Long sNo;
 
     @NotBlank
     private String code;
+
+    @NotBlank
+    private String name;
 
     @NotBlank
     private String title;
@@ -23,6 +22,6 @@ public class CourseDto {
     @NotBlank
     private String level;
 
-    /** Optional image file */
+    // this will be bound from your FormData
     private MultipartFile image;
 }
