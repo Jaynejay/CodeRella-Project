@@ -1,15 +1,22 @@
 package com.example.coderella.controller;
 
 import com.example.coderella.dto.AdminUserCreationRequest;
+import com.example.coderellaProject.dto.AdminUserUpdateRequest;
 import com.example.coderella.entity.Role;
 import com.example.coderella.entity.User;
 import com.example.coderella.repository.UserRepository;
+import com.example.coderellaProject.dto.UserSummaryDto;
+import com.example.coderellaProject.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -21,12 +28,13 @@ public class AdminController {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final UserService userService;
 
     @GetMapping("/pending")
     public ResponseEntity<List<User>> getPendingPaperSetters() {
         List<User> pendingUsers = userRepository.findAll()
                 .stream()
-                .filter(user -> user.getRole() == Role.PAPER_SETTER && !user.isActive() && user.isProfileCompleted())
+                .filter(user -> user.getRole() == Role.PAPER_SETTER && !user.isActive() && user.isProfileCompleted() && !Boolean.TRUE.equals(user.isScheduledForDeletion()))
                 .toList();
         System.out.println("Pending Paper Setters Found: " + pendingUsers.size());
         pendingUsers.forEach(user -> System.out.println(" - " + user.getEmail()));
@@ -129,4 +137,127 @@ public class AdminController {
         result.put("roles", roles);
         return ResponseEntity.ok(result);
     }
+
+   @GetMapping("/users/all")
+    @PreAuthorize("hasAuthority('SUPER_ADMIN')")
+    public ResponseEntity<List<UserSummaryDto>> getAllUserSummaries() {
+        List<UserSummaryDto> userSummaries = userService.getAllUsers();
+        return ResponseEntity.ok(userSummaries);
+    }
+
+    @GetMapping("/users/{id}")
+    @PreAuthorize("hasAuthority('SUPER_ADMIN')")
+    public ResponseEntity<User> getUserById(@PathVariable Long id) {
+        Optional<User> user = userRepository.findById(id);
+        return user.map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+
+    @PutMapping("/users/{id}")
+    @PreAuthorize("hasAuthority('SUPER_ADMIN')")
+    public ResponseEntity<?> updateUserByAdmin(
+            @PathVariable Long id,
+            @RequestBody AdminUserUpdateRequest req) {
+
+        Optional<User> existing = userRepository.findById(id);
+        if (existing.isEmpty()) return ResponseEntity.notFound().build();
+
+        User user = existing.get();
+        user.setFirstname(req.getFirstname());
+        user.setLastname(req.getLastname());
+        user.setEmail(req.getEmail());
+        user.setDesignation(req.getDesignation());
+        user.setHomeNo(req.getHomeNo());
+        user.setStreet(req.getStreet());
+        user.setCity(req.getCity());
+        user.setDistrict(req.getDistrict());
+        user.setAccountHolderName(req.getAccountHolderName());
+        user.setAccountNumber(req.getAccountNumber());
+        user.setBankName(req.getBankName());
+        user.setBranch(req.getBranch());
+        user.setPhoneNumbers(req.getPhoneNumbers());
+        user.setLanguages(req.getLanguages());
+
+        userRepository.save(user);
+        return ResponseEntity.ok("User updated successfully");
+    }
+
+
+    @PutMapping("/users/{id}/delete")
+    public ResponseEntity<?> scheduleUserDeletion(@PathVariable Long id) {
+        Optional<User> optional = userRepository.findById(id);
+        if (optional.isEmpty()) return ResponseEntity.notFound().build();
+
+        User user = optional.get();
+
+        if (user.getRole() == Role.SUPER_ADMIN) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Cannot delete a SUPER_ADMIN account.");
+        }
+
+        user.setActive(false);  // deactivate account
+        user.setScheduledForDeletion(true);
+        user.setDeletionScheduledAt(LocalDateTime.now().plusMonths(1));
+        userRepository.save(user);
+
+        return ResponseEntity.ok("User scheduled for deletion in 1 month.");
+    }
+
+    @PutMapping("/users/{id}/undo-delete")
+    public ResponseEntity<?> undoUserDeletion(@PathVariable Long id) {
+        Optional<User> optional = userRepository.findById(id);
+        if (optional.isEmpty()) return ResponseEntity.notFound().build();
+
+        User user = optional.get();
+        if (!user.isScheduledForDeletion()) {
+            return ResponseEntity.badRequest().body("User is not scheduled for deletion.");
+        }
+
+        user.setScheduledForDeletion(false);
+        user.setDeletionScheduledAt(null);
+        user.setActive(true);  // optionally reactivate
+        userRepository.save(user);
+
+        return ResponseEntity.ok("User deletion undone and account reactivated.");
+    }
+
+    @DeleteMapping("/decline/{id}")
+    @PreAuthorize("hasAuthority('SUPER_ADMIN')")
+    public ResponseEntity<String> declinePendingUser(@PathVariable Long id) {
+        Optional<User> userOpt = userRepository.findById(id);
+
+        if (userOpt.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        User user = userOpt.get();
+
+        // Only allow declining if profile is completed but not approved
+        if (user.getRole() == Role.PAPER_SETTER && user.isProfileCompleted() && !user.isActive()) {
+            userRepository.delete(user);
+            return ResponseEntity.ok("User declined and deleted.");
+        }
+
+        return ResponseEntity.badRequest().body("Only pending Paper Setter requests can be declined.");
+    }
+
+
+    @GetMapping("/users/{id}/profile-image")
+    @PreAuthorize("hasAuthority('SUPER_ADMIN')")
+    public ResponseEntity<byte[]> getUserProfileImageById(@PathVariable Long id) {
+        Optional<User> userOpt = userRepository.findById(id);
+        if (userOpt.isEmpty()) return ResponseEntity.notFound().build();
+
+        User user = userOpt.get();
+        byte[] image = user.getProfileImage();
+        if (image == null || image.length == 0) {
+            return ResponseEntity.notFound().build();
+        }
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.IMAGE_JPEG); // Or adjust to PNG if needed
+        return new ResponseEntity<>(image, headers, HttpStatus.OK);
+    }
+
+ 
 }
