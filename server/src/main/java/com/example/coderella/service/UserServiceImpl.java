@@ -1,10 +1,10 @@
 // src/main/java/com/example/coderellaProject/service/UserServiceImpl.java
-package com.example.coderellaProject.service;
+package com.example.coderella.service;
 
-import com.example.coderellaProject.dto.UserSummaryDto;
-import com.example.coderellaProject.model.User;
-import com.example.coderellaProject.repository.UserRepository;
-import com.example.coderellaProject.service.UserService;
+import com.example.coderella.dto.UserSummaryDto;
+import com.example.coderella.entity.User;
+import com.example.coderella.repository.UserRepository;
+import com.example.coderella.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
