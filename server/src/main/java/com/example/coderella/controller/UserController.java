@@ -131,49 +131,36 @@ public class UserController {
     public ResponseEntity<String> uploadProfileImage(
             @RequestParam("file") MultipartFile file,
             Authentication authentication) {
-
-        String username = authentication.getName();
-        String uploadDir = "uploads/";
-        String fileName = username + ".jpg"; // or use file.getOriginalFilename() if preferred
-
         try {
-            Path uploadPath = Paths.get(uploadDir);
-            if (!Files.exists(uploadPath)) {
-                Files.createDirectories(uploadPath);
-            }
+            String username = authentication.getName();
+            User user = userRepository.findByUsername(username);
 
-            Path filePath = uploadPath.resolve(fileName);
-            Files.write(filePath, file.getBytes());
+            user.setProfileImage(file.getBytes());
+            userRepository.save(user);
 
-            // ✅ Log activity
             activityService.logActivity(username, "UPLOAD_PROFILE_IMAGE", "User uploaded a profile image.");
-
-            return ResponseEntity.ok("Profile image uploaded successfully.");
-
+            return ResponseEntity.ok("Profile image uploaded to database successfully.");
         } catch (IOException e) {
             e.printStackTrace();
-            return ResponseEntity.status(500).body("Failed to upload profile image.");
+            return ResponseEntity.status(500).body("Failed to upload profile image to DB.");
         }
     }
+
 
     @GetMapping("/profile-image")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<byte[]> getProfileImage(Authentication authentication) {
         String username = authentication.getName();
-        Path path = Paths.get("uploads/" + username + ".jpg");
+        User user = userRepository.findByUsername(username);
 
-        if (!Files.exists(path)) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null); // 👈 return null body but correct type
+        byte[] image = user.getProfileImage();
+        if (image == null || image.length == 0) {
+            return ResponseEntity.notFound().build();
         }
 
-        try {
-            byte[] image = Files.readAllBytes(path);
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.IMAGE_JPEG);
-            return new ResponseEntity<>(image, headers, HttpStatus.OK);
-        } catch (IOException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null); // 👈 same fix here
-        }
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.IMAGE_JPEG); // Or PNG based on your usage
+        return new ResponseEntity<>(image, headers, HttpStatus.OK);
     }
 
 
