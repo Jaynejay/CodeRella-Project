@@ -1,5 +1,5 @@
 // src/main/java/com/example/coderellaProject/dto/UserSummaryDto.java
-package com.example.coderellaProject.dto;
+package com.example.coderella.dto;
 
 import lombok.*;
 
