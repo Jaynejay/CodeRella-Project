@@ -1,5 +1,5 @@
 
-package com.example.coderellaProject.dto;
+package com.example.coderella.dto;
 
 import lombok.*;
 import java.util.List;
