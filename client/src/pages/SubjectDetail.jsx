@@ -2,33 +2,57 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
 
-export default function AssignPaperSetters() {
+import CourseSidebar from "../components/layout/CourseSidebar";
+import NavbarCourse from '../components/layout/NavbarCourse';
+
+export default function SubjectDetail() {
   const { subjectCode } = useParams();
 
-  const [paperSetters, setPaperSetters] = useState([
-    { registrationId: 'DTET_PS5431', name: 'Wimalasekera I.S.' },
-    { registrationId: 'DTET_PS7721', name: 'Amarathunga A.T.' },
-    { registrationId: 'DTET_PS4788', name: 'Jayaprabha P.H.J.' },
-    { registrationId: 'DTET_PS229', name: 'Amarasiri K.J.M.' },
-    { registrationId: 'DTET_PS5296', name: 'Lokupathirage I.M.' },
-    { registrationId: 'DTET_PS2311', name: 'Wijerathna S.M.' },
-    { registrationId: 'DTET_PS5111', name: 'Jayathilake P.P.P' },
-    { registrationId: 'DTET_PS8957', name: 'Abesekara I.M.' },
-  ]);
+  const [paperSetters, setPaperSetters] = useState([]);
+  const [assignedSetters, setAssignedSetters] = useState([]);
+  const [originalList, setOriginalList] = useState([]);
+  const [subjectTitle, setSubjectTitle] = useState('');
 
   useEffect(() => {
-    // Track subject visit (POST to backend)
+    // Track subject visit
     axios.post(`http://localhost:8080/api/recent-subjects/${subjectCode}`)
-      .then(() => console.log('Subject visit logged'))
-      .catch((err) => console.error('Failed to track subject visit:', err));
+      .catch(err => console.error('Failed to track subject visit:', err));
+
+    // Load subject title
+    // axios.get(`http://localhost:8080/api/subjects/${subjectCode}`)
+    //   .then(res => setSubjectTitle(res.data.title))
+    //   .catch(err => console.error('Failed to fetch subject title:', err));
+
+    // Load all paper setters
+    axios.get('http://localhost:8080/api/paper-setters')
+      .then(res => {
+        setPaperSetters(res.data);
+        setOriginalList(res.data);
+      })
+      .catch(err => console.error('Failed to fetch paper setters', err));
+
+    // Load assigned paper setters
+    axios.get(`http://localhost:8080/api/subject-assignments/${subjectCode}`)
+      .then(res => setAssignedSetters(res.data))
+      .catch(err => console.error('Failed to fetch assigned setters', err));
   }, [subjectCode]);
 
   const assignPaperSetter = (registrationId) => {
-    console.log(`Assigned ${registrationId} to ${subjectCode}`);
+    axios.post('http://localhost:8080/api/subject-assignments/assign', {
+      subjectCode,
+      registrationId
+    }).then(() => {
+      setAssignedSetters(prev => [...prev, registrationId]);
+    }).catch(err => console.error('Assign failed', err));
   };
 
   const cancelPaperSetter = (registrationId) => {
-    console.log(`Canceled ${registrationId} from ${subjectCode}`);
+    axios.post('http://localhost:8080/api/subject-assignments/cancel', {
+      subjectCode,
+      registrationId
+    }).then(() => {
+      setAssignedSetters(prev => prev.filter(id => id !== registrationId));
+    }).catch(err => console.error('Cancel failed', err));
   };
 
   const handleSearch = (e) => {
@@ -41,61 +65,65 @@ export default function AssignPaperSetters() {
     setPaperSetters(filtered);
   };
 
-  const originalList = [
-    { registrationId: 'DTET_PS5431', name: 'Wimalasekera I.S.' },
-    { registrationId: 'DTET_PS7721', name: 'Amarathunga A.T.' },
-    { registrationId: 'DTET_PS4788', name: 'Jayaprabha P.H.J.' },
-    { registrationId: 'DTET_PS229', name: 'Amarasiri K.J.M.' },
-    { registrationId: 'DTET_PS5296', name: 'Lokupathirage I.M.' },
-    { registrationId: 'DTET_PS2311', name: 'Wijerathna S.M.' },
-    { registrationId: 'DTET_PS5111', name: 'Jayathilake P.P.P' },
-    { registrationId: 'DTET_PS8957', name: 'Abesekara I.M.' },
-  ];
-
   return (
-    <div className="p-8 pt-20 bg-white min-h-screen">
-      <h2 className="text-2xl font-semibold mb-4">{subjectCode} - Technical Drawing</h2>
+    <div className="flex min-h-screen bg-gray-100">
+      {/* Sidebar */}
+      <CourseSidebar />
 
-      <input
-        type="text"
-        placeholder="Search"
-        className="px-4 py-2 border rounded mb-4 w-1/3"
-        onChange={handleSearch}
-      />
+      {/* Main Content */}
+      <div className="flex-1">
+        <NavbarCourse />
 
-      <table className="w-full text-left border">
-        <thead className="bg-blue-200">
-          <tr>
-            <th className="px-4 py-2">No.</th>
-            <th className="px-4 py-2">Registration_ID</th>
-            <th className="px-4 py-2">Paper setter Name</th>
-            <th className="px-4 py-2">Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {paperSetters.map((ps, index) => (
-            <tr key={ps.registrationId} className="bg-blue-100">
-              <td className="px-4 py-2">{index + 1}</td>
-              <td className="px-4 py-2">{ps.registrationId}</td>
-              <td className="px-4 py-2">{ps.name}</td>
-              <td className="px-4 py-2 space-x-2">
-                <button
-                  onClick={() => assignPaperSetter(ps.registrationId)}
-                  className="bg-blue-500 text-white px-3 py-1 rounded"
-                >
-                  Assign
-                </button>
-                <button
-                  onClick={() => cancelPaperSetter(ps.registrationId)}
-                  className="bg-gray-500 text-white px-3 py-1 rounded"
-                >
-                  Cancel
-                </button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+        <div className="p-8 mt-16">
+          <h2 className="text-2xl font-semibold mb-4">
+            Subject: {subjectCode}
+          </h2>
+
+          <input
+            type="text"
+            placeholder="Search"
+            className="px-4 py-2 border rounded mb-4 w-1/3"
+            onChange={handleSearch}
+          />
+
+          <table className="w-full text-left border">
+            <thead className="bg-blue-200 sticky top-0">
+              <tr>
+                <th className="px-4 py-2">No.</th>
+                <th className="px-4 py-2">Registration ID</th>
+                <th className="px-4 py-2">Paper Setter Name</th>
+                <th className="px-4 py-2">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {paperSetters.map((ps, index) => (
+                <tr key={ps.registrationId} className="bg-blue-100">
+                  <td className="px-4 py-2">{index + 1}</td>
+                  <td className="px-4 py-2">{ps.registrationId}</td>
+                  <td className="px-4 py-2">{ps.name}</td>
+                  <td className="px-4 py-2 space-x-2">
+                    {assignedSetters.includes(ps.registrationId) ? (
+                      <button
+                        onClick={() => cancelPaperSetter(ps.registrationId)}
+                        className="bg-gray-500 text-white px-3 py-1 rounded"
+                      >
+                        Cancel
+                      </button>
+                    ) : (
+                      <button
+                        onClick={() => assignPaperSetter(ps.registrationId)}
+                        className="bg-blue-500 text-white px-3 py-1 rounded"
+                      >
+                        Assign
+                      </button>
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
   );
 }

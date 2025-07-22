@@ -48,6 +48,6 @@ public class RecentSubjectService {
 
 
     public List<RecentSubjects> getRecentSubjects() {
-        return recentRepo.findTop5ByOrderByLastAccessedDesc();
+        return recentRepo.findTop3ByOrderByLastAccessedDesc();
     }
 }

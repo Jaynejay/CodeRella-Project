@@ -30,7 +30,6 @@ export default function AnnouncementPage() {
     fetch(`http://localhost:8080/api/announcements/user/${loggedInUsername}`)
       .then(res => res.json())
       .then(data => {
-        // Add formatted date to each announcement
         const announcementsWithDate = data.map(a => ({
           ...a,
           date: new Date(a.date).toLocaleDateString('en-US', { day: 'numeric', month: 'short' }),
@@ -54,9 +53,11 @@ export default function AnnouncementPage() {
   };
 
   const addNewAnnouncement = ({ to, subject, message }) => {
+    const recipientUsernames = to.split(',').map(u => u.trim()).filter(Boolean); // ✅ now an array
+
     const newAnnouncement = {
       author: 'admin001', // TODO: Replace with dynamic admin
-      recipientUsername: to,
+      recipientUsernames,
       title: subject,
       message: message
     };
@@ -71,7 +72,7 @@ export default function AnnouncementPage() {
         const formatted = {
           ...saved,
           date: new Date(saved.date).toLocaleDateString('en-US', { day: 'numeric', month: 'short' }),
-          recipient: saved.recipientUsername
+          recipient: recipientUsernames.join(', ')
         };
         setAnnouncements(prev => [formatted, ...prev]);
         setShowComposeForm(false);
@@ -110,7 +111,6 @@ export default function AnnouncementPage() {
   return (
     <div className="w-full max-w-6xl mx-auto pt-36">
       <style>{fadeInKeyframes}</style>
-      {/* Main Interface */}
       <div className="flex p-4 bg-gray-50 rounded relative">
         {/* Sidebar */}
         <div className="w-52 bg-gray-50 rounded-lg mr-4 p-2">
@@ -140,7 +140,7 @@ export default function AnnouncementPage() {
           ))}
         </div>
 
-        {/* Content */}
+        {/* Main Content */}
         <div className="flex-1 relative">
           <div className="flex mb-4">
             <div className="flex items-center bg-gray-100 rounded-full px-4 py-2 flex-1 mr-2">

@@ -169,7 +169,7 @@ function App() {
           {/* User Dashboard */}
           <Route path="/userdashboard" element={<DashboardUser />} />
           <Route path="/mysubjects" element={<UserSubjects />} />
-          <Route path="/subject/:id" element={<SubjectDetail />} />
+          {/* <Route path="/subject/:id" element={<SubjectDetail />} /> */}
 
           {/* User Announcements */}
           <Route
@@ -247,12 +247,12 @@ function App() {
           <Route path="/examdates" element={<ExamDates />} />
 
           {/* Exam Management */}
-          <Route path="/exam-management" element={<ExamManagement2 />} />
+          {/* <Route path="/exam-management" element={<ExamManagement2 />} />
           <Route path="/exam-management/:examId" element={<ExamCourses />} />
           <Route
             path="/exam-management/:examId/course/:courseId"
             element={<SubjectDetailsPage />}
-          />
+          /> */}
           <Route
             path="/exam-management/:examId/course/:courseId/papersetter/:papersetterId/assign"
             element={<PaperSetterAssignPage />}
@@ -271,6 +271,8 @@ function App() {
             path="/subject-details/:courseId"
             element={<SubjectDetailsPage />}
           />
+          <Route path="/subject/:subjectCode" element={<SubjectDetail />} />
+
 
           <Route path="*" element={<NotFound />} />
         </Routes>

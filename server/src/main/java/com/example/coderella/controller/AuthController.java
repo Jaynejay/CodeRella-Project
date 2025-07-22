@@ -69,7 +69,7 @@ public class AuthController {
         Authentication authentication = authManager.authenticate(
                 new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword())
         );
-        User user = userRepository.findByUsername(request.getUsername());
+        User user = userRepository.findByUsername(request.getUsername()).orElse(null);// I corected here by .orElse(null);;
 
         // Log the activity
         activityService.logActivity(
