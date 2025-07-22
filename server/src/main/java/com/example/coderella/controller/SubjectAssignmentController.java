@@ -31,7 +31,9 @@ public class SubjectAssignmentController {
     @GetMapping("/{subjectCode}")
     public ResponseEntity<List<String>> getAssignments(@PathVariable String subjectCode) {
         List<String> assignedIds = assignmentService.getAssignmentsForSubject(subjectCode)
-                .stream().map(SubjectAssignment::getPaperSetterRegistrationId).toList();
+                .stream()
+                .map(a -> a.getPaperSetter().getRegistrationId()) // ✅ use getter on PaperSetter entity
+                .toList();
         return ResponseEntity.ok(assignedIds);
     }
 }

@@ -64,7 +64,7 @@ public class CourseService {
         return repo.save(c);
     }
 
-    
+
 
     @Transactional(readOnly = true)
     public Course getBySNo(Long sNo) {

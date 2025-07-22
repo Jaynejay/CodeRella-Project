@@ -17,21 +17,22 @@ const NavbarUser = () => {
 
         <nav className="flex space-x-12 ml-8">
           <Link
-            to="/dashboard"
-            className={`${location.pathname === '/dashboard' ? 'text-blue-600' : 'text-gray-800'} hover:text-blue-600 hover:border-b-2 hover:border-blue-600`}
+            to="/userdashboard"
+            className={`${location.pathname === '/userdashboard' ? 'text-blue-600' : 'text-gray-800'} hover:text-blue-600 hover:border-b-2 hover:border-blue-600`}
           >
             Dashboard
           </Link>
         
           <Link
-            to="dashboard/mysubjects"
-            className={`${location.pathname === 'dashboard/my-subjects' ? 'text-blue-600' : 'text-gray-800'} hover:text-blue-600 hover:border-b-2 hover:border-blue-600`}
-          >
-            My Subjects
-          </Link>
+  to="/userdashboard/mysubjects"
+  className={`${location.pathname === '/userdashboard/mysubjects' ? 'text-blue-600' : 'text-gray-800'} hover:text-blue-600 hover:border-b-2 hover:border-blue-600`}
+>
+  My Subjects
+</Link>
+
           <Link
-            to="dashboard/payments"
-            className={`${location.pathname === 'dashboard/payments' ? 'text-blue-600' : 'text-gray-800'} hover:text-blue-600 hover:border-b-2 hover:border-blue-600`}
+            to="/userdashboard/payments"
+            className={`${location.pathname === '/userdashboard/payments' ? 'text-blue-600' : 'text-gray-800'} hover:text-blue-600 hover:border-b-2 hover:border-blue-600`}
           >
             My Payments
           </Link>

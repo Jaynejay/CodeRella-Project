@@ -1,4 +1,3 @@
-// src/pages/DashboardUser.jsx
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
@@ -17,22 +16,24 @@ export default function DashboardUser() {
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [showDeadline, setShowDeadline] = useState(false);
 
-  const registrationId = "224008K";  // Replace dynamically if needed
-  const paperSetterId = 1;           // Replace dynamically if needed
+  const registrationId = localStorage.getItem("registrationId") || "DTET_PS5431";
+  const paperSetterId = localStorage.getItem("paperSetterId") || 1; // if needed later
 
   useEffect(() => {
-    axios.get(`http://localhost:8080/api/subjects/papersetter/${registrationId}`)
-      .then(res => {
-        const mapped = res.data.map((s) => ({
-          id: s.id,
-          title: s.title,
-          level: s.level,
-          cover: `http://localhost:8080/${s.imageUrl}`  // dynamic image
-        }));
-        setRecentCourses(mapped);
-      })
-      .catch(err => console.error("Subjects fetch failed:", err));
+    // ✅ Fetch subjects assigned to the paper setter
+    axios.get(`http://localhost:8080/api/subjects/assigned-to/${registrationId}`)
+  .then(res => {
+    const mapped = res.data.map((s) => ({
+      id: s.code,
+      title: s.title,
+      level: s.level,
+      cover: `http://localhost:8080/uploads/subject_covers/${s.coverPath}`
+    }));
+    setRecentCourses(mapped);
+  })
+  .catch(err => console.error("Subjects fetch failed:", err));
 
+    // ✅ Fetch announcements
     axios.get("http://localhost:8080/api/papersetter/announcements", {
       params: { paperSetterId }
     })
@@ -50,6 +51,7 @@ export default function DashboardUser() {
       })
       .catch(err => console.error("Announcements fetch failed:", err));
 
+    // ✅ Fetch calendar events
     axios.get("http://localhost:8080/api/calendar/activities", {
       params: { paperSetterId }
     })
@@ -79,7 +81,7 @@ export default function DashboardUser() {
             <h2 className="mb-4 text-lg font-semibold">Recently accessed subjects</h2>
             <div className="grid gap-8 sm:grid-cols-3 lg:grid-cols-4 mb-8">
               {recentCourses.map(c => (
-                <Link to={c.id} key={c.id} className="overflow-hidden rounded-lg border hover:shadow w-full">
+                <Link to={`/subject/${c.id}`} key={c.id} className="overflow-hidden rounded-lg border hover:shadow w-full">
                   <div className="relative aspect-square w-full">
                     <img src={c.cover} alt={c.title} className="absolute inset-0 h-full w-full object-cover" />
                     <span className="absolute top-1 left-1 rounded bg-blue-800 px-2 py-0.5 text-xs font-semibold text-white">

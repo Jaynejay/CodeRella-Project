@@ -1,33 +1,50 @@
-// src/main/java/com/example/coderellaProject/service/SubjectService.java
 package com.example.coderella.service;
 
 import com.example.coderella.dto.SubjectDto;
 import com.example.coderella.entity.Course;
 import com.example.coderella.entity.Subject;
+import com.example.coderella.repository.SubjectAssignmentRepository;
+import com.example.coderella.repository.PaperSetterRepository;
 import com.example.coderella.repository.SubjectRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
-import java.io.IOException;
-import java.util.List;
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 
 @Service
 public class SubjectService {
     private final SubjectRepository subjectRepo;
     private final CourseService courseService;
+    private final PaperSetterRepository paperSetterRepo;
+    private final SubjectAssignmentRepository subjectAssignmentRepo;
 
-    public SubjectService(SubjectRepository subjectRepo,
-                          CourseService courseService) {
+    public SubjectService(
+            SubjectRepository subjectRepo,
+            CourseService courseService,
+            PaperSetterRepository paperSetterRepo,
+            SubjectAssignmentRepository subjectAssignmentRepo
+    ) {
         this.subjectRepo = subjectRepo;
         this.courseService = courseService;
+        this.paperSetterRepo = paperSetterRepo;
+        this.subjectAssignmentRepo = subjectAssignmentRepo;
     }
 
     public List<Subject> listByCourse(Long sNo) {
         Course course = courseService.getBySNo(sNo);
-        return subjectRepo.findByCourse_Code(course.getCode()); // still use course code
+        return subjectRepo.findByCourse_Code(course.getCode());
+    }
+
+    public List<Subject> getSubjectsByPaperSetter(String registrationId) {
+        if (!paperSetterRepo.existsByRegistrationId(registrationId)) {
+            throw new EntityNotFoundException("Paper setter not found: " + registrationId);
+        }
+
+        return subjectAssignmentRepo.findSubjectsByRegistrationId(registrationId);
     }
 
     public Subject create(Long sNo, SubjectDto dto) {
@@ -43,8 +60,6 @@ public class SubjectService {
             try {
                 String fileName = System.currentTimeMillis() + "_" + dto.getImage().getOriginalFilename();
 
-                // ✅ Use your exact folder path
-
                 String uploadDir = "C:/Users/DELL/OneDrive/Desktop/New/new/CodeRella-Project/server/uploads/subject_covers/";
                 Path uploadPath = Paths.get(uploadDir);
 
@@ -56,7 +71,7 @@ public class SubjectService {
                 Path filePath = uploadPath.resolve(fileName);
                 dto.getImage().transferTo(filePath.toFile());
 
-                s.setCoverPath(fileName); // Save just the filename (not full path)
+                s.setCoverPath(fileName);
                 System.out.println("✅ Saved image to: " + filePath);
             } catch (IOException e) {
                 e.printStackTrace();

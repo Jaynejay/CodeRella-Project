@@ -273,6 +273,9 @@ function App() {
           />
           <Route path="/subject/:subjectCode" element={<SubjectDetail />} />
 
+          <Route path="/userdashboard/mysubjects" element={<UserSubjects />} />
+
+
 
           <Route path="*" element={<NotFound />} />
         </Routes>
