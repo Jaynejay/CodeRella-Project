@@ -1,35 +1,35 @@
 // src/pages/AnnDetailUser.jsx
-import { useNavigate, useLocation, useParams } from 'react-router-dom'
-import NavbarUser from '../components/layout/NavbarUser'
-import { ArrowLeft, Paperclip } from 'lucide-react'
+import { useNavigate, useLocation, useParams } from "react-router-dom";
+import NavbarUser from "../components/layout/NavbarUser";
+import { ArrowLeft, Paperclip } from "lucide-react";
 
 export default function AnnDetailUser() {
-  const navigate = useNavigate()
-  const { state } = useLocation()
-  const { id } = useParams()
+  const navigate = useNavigate();
+  const { state } = useLocation();
+  const { id } = useParams();
 
   // 1) Define your defaults
-  const defaultAttachments = [{ name: 'document.pdf', url: '#' }]
+  const defaultAttachments = [{ name: "document.pdf", url: "#" }];
   const defaultAnnouncement = {
-    author: 'Author Name',
-    recipient: 'Recipient Name',
+    author: "Author Name",
+    recipient: "Recipient Name",
     title: `Announcement #${id}`,
-    date: '1 Jan',
-    message: 'Full announcement content goes here.',
-    attachments: defaultAttachments
-  }
+    date: "1 Jan",
+    message: "Full announcement content goes here.",
+    attachments: defaultAttachments,
+  };
 
   // 2) Merge in any state, but then explicitly set attachments just once
-  const fromState = state?.announcement ?? {}
+  const fromState = state?.announcement ?? {};
   const announcement = {
     ...defaultAnnouncement,
     ...fromState,
-    attachments: fromState.attachments ?? defaultAttachments
-  }
+    attachments: fromState.attachments ?? defaultAttachments,
+  };
 
-  const isSent = announcement.author === 'You'
-  const label  = isSent ? 'To' : 'By'
-  const name   = isSent ? announcement.recipient : announcement.author
+  const isSent = announcement.author === "You";
+  const label = isSent ? "To" : "By";
+  const name = isSent ? announcement.recipient : announcement.author;
 
   return (
     <div className="min-h-screen bg-gray-100 pt-20">
@@ -69,5 +69,5 @@ export default function AnnDetailUser() {
         )}
       </main>
     </div>
-  )
+  );
 }

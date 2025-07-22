@@ -1,8 +1,15 @@
 // src/components/AnnouncementPage.jsx
-import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Search, Mail, Send as SendIcon, FileText, Star, Trash2 } from 'lucide-react';
-import NewAnnouncement from './NewAnnouncement';
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import {
+  Search,
+  Mail,
+  Send as SendIcon,
+  FileText,
+  Star,
+  Trash2,
+} from "lucide-react";
+import NewAnnouncement from "./NewAnnouncement";
 
 const fadeInKeyframes = `
   @keyframes fadeIn {
@@ -18,9 +25,9 @@ export default function AnnouncementPage() {
   const navigate = useNavigate();
   const [announcements, setAnnouncements] = useState([]);
   const [starredAnnouncements, setStarredAnnouncements] = useState({});
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(false);
-  const [activeSidebarItem, setActiveSidebarItem] = useState('inbox');
+  const [activeSidebarItem, setActiveSidebarItem] = useState("inbox");
   const [showComposeForm, setShowComposeForm] = useState(false);
 
   const loggedInUsername = "papersetter001"; // TODO: Replace with dynamic user
@@ -28,18 +35,21 @@ export default function AnnouncementPage() {
   useEffect(() => {
     setLoading(true);
     fetch(`http://localhost:8080/api/announcements/user/${loggedInUsername}`)
-      .then(res => res.json())
-      .then(data => {
+      .then((res) => res.json())
+      .then((data) => {
         // Add formatted date to each announcement
-        const announcementsWithDate = data.map(a => ({
+        const announcementsWithDate = data.map((a) => ({
           ...a,
-          date: new Date(a.date).toLocaleDateString('en-US', { day: 'numeric', month: 'short' }),
-          recipient: a.recipientUsername
+          date: new Date(a.date).toLocaleDateString("en-US", {
+            day: "numeric",
+            month: "short",
+          }),
+          recipient: a.recipientUsername,
         }));
         setAnnouncements(announcementsWithDate);
         setLoading(false);
       })
-      .catch(err => {
+      .catch((err) => {
         console.error("Failed to fetch announcements", err);
         setLoading(false);
       });
@@ -50,61 +60,67 @@ export default function AnnouncementPage() {
 
   const toggleStar = (id, e) => {
     e.stopPropagation();
-    setStarredAnnouncements(prev => ({ ...prev, [id]: !prev[id] }));
+    setStarredAnnouncements((prev) => ({ ...prev, [id]: !prev[id] }));
   };
 
   const addNewAnnouncement = ({ to, subject, message }) => {
     const newAnnouncement = {
-      author: 'admin001', // TODO: Replace with dynamic admin
+      author: "admin001", // TODO: Replace with dynamic admin
       recipientUsername: to,
       title: subject,
-      message: message
+      message: message,
     };
 
-    fetch('http://localhost:8080/api/announcements', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(newAnnouncement)
+    fetch("http://localhost:8080/api/announcements", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(newAnnouncement),
     })
-      .then(res => res.json())
-      .then(saved => {
+      .then((res) => res.json())
+      .then((saved) => {
         const formatted = {
           ...saved,
-          date: new Date(saved.date).toLocaleDateString('en-US', { day: 'numeric', month: 'short' }),
-          recipient: saved.recipientUsername
+          date: new Date(saved.date).toLocaleDateString("en-US", {
+            day: "numeric",
+            month: "short",
+          }),
+          recipient: saved.recipientUsername,
         };
-        setAnnouncements(prev => [formatted, ...prev]);
+        setAnnouncements((prev) => [formatted, ...prev]);
         setShowComposeForm(false);
       })
-      .catch(err => console.error("Failed to send announcement", err));
+      .catch((err) => console.error("Failed to send announcement", err));
   };
 
   const deleteAnnouncement = (id, e) => {
     e.stopPropagation();
     fetch(`http://localhost:8080/api/announcements/${id}`, {
-      method: 'DELETE'
+      method: "DELETE",
     })
       .then(() => {
-        setAnnouncements(prev => prev.filter(a => a.id !== id));
-        setStarredAnnouncements(prev => {
+        setAnnouncements((prev) => prev.filter((a) => a.id !== id));
+        setStarredAnnouncements((prev) => {
           const next = { ...prev };
           delete next[id];
           return next;
         });
       })
-      .catch(err => console.error("Failed to delete announcement", err));
+      .catch((err) => console.error("Failed to delete announcement", err));
   };
 
   const filteredAnnouncements = announcements
-    .filter(a => {
-      if (activeSidebarItem === 'starred') return !!starredAnnouncements[a.id];
-      if (activeSidebarItem === 'sent') return a.author === 'admin001';
-      if (activeSidebarItem === 'draft') return a.title.includes('Draft');
+    .filter((a) => {
+      if (activeSidebarItem === "starred") return !!starredAnnouncements[a.id];
+      if (activeSidebarItem === "sent") return a.author === "admin001";
+      if (activeSidebarItem === "draft") return a.title.includes("Draft");
       return true;
     })
-    .filter(a =>
-      a.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      ((activeSidebarItem === 'sent' ? a.recipient : a.author).toLowerCase().includes(searchTerm.toLowerCase()))
+    .filter(
+      (a) =>
+        a.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (activeSidebarItem === "sent" ? a.recipient : a.author)
+          .toLowerCase()
+          .includes(searchTerm.toLowerCase())
     );
 
   return (
@@ -121,21 +137,48 @@ export default function AnnouncementPage() {
             <Mail size={16} className="mr-2" /> Compose
           </button>
           {[
-            { key: 'inbox', icon: Mail, label: 'Inbox', count: announcements.filter(a => a.author !== 'admin001').length },
-            { key: 'sent', icon: SendIcon, label: 'Sent', count: announcements.filter(a => a.author === 'admin001').length },
-            { key: 'draft', icon: FileText, label: 'Draft', count: announcements.filter(a => a.title.includes('Draft')).length },
-            { key: 'starred', icon: Star, label: 'Starred', count: Object.values(starredAnnouncements).filter(Boolean).length },
+            {
+              key: "inbox",
+              icon: Mail,
+              label: "Inbox",
+              count: announcements.filter((a) => a.author !== "admin001")
+                .length,
+            },
+            {
+              key: "sent",
+              icon: SendIcon,
+              label: "Sent",
+              count: announcements.filter((a) => a.author === "admin001")
+                .length,
+            },
+            {
+              key: "draft",
+              icon: FileText,
+              label: "Draft",
+              count: announcements.filter((a) => a.title.includes("Draft"))
+                .length,
+            },
+            {
+              key: "starred",
+              icon: Star,
+              label: "Starred",
+              count: Object.values(starredAnnouncements).filter(Boolean).length,
+            },
           ].map(({ key, icon: Icon, label, count }) => (
             <div
               key={key}
               onClick={() => handleSidebarItemClick(key)}
-              className={`flex items-center justify-between px-4 py-2 mb-1 cursor-pointer ${activeSidebarItem === key ? 'bg-blue-50 rounded' : ''}`}
+              className={`flex items-center justify-between px-4 py-2 mb-1 cursor-pointer ${
+                activeSidebarItem === key ? "bg-blue-50 rounded" : ""
+              }`}
             >
               <div className="flex items-center">
                 <Icon size={16} className="text-gray-600 mr-2" />
                 <span>{label}</span>
               </div>
-              <span className="bg-gray-200 rounded-full px-2 text-xs">{count}</span>
+              <span className="bg-gray-200 rounded-full px-2 text-xs">
+                {count}
+              </span>
             </div>
           ))}
         </div>
@@ -150,32 +193,49 @@ export default function AnnouncementPage() {
                 placeholder="Search announcements"
                 className="bg-transparent border-none focus:outline-none flex-1"
                 value={searchTerm}
-                onChange={e => setSearchTerm(e.target.value)}
+                onChange={(e) => setSearchTerm(e.target.value)}
               />
             </div>
           </div>
 
-          <div className="space-y-3 overflow-y-auto pr-2" style={{ maxHeight: 400 }}>
+          <div
+            className="space-y-3 overflow-y-auto pr-2"
+            style={{ maxHeight: 400 }}
+          >
             {loading ? (
               <div className="flex justify-center py-4">
                 <div className="animate-spin h-8 w-8 border-b-2 border-blue-600 rounded-full" />
               </div>
             ) : filteredAnnouncements.length === 0 ? (
-              <div className="text-center py-8 text-gray-500">No announcements found</div>
+              <div className="text-center py-8 text-gray-500">
+                No announcements found
+              </div>
             ) : (
-              filteredAnnouncements.map(a => {
-                const displayName = activeSidebarItem === 'sent' ? a.recipient : a.author;
+              filteredAnnouncements.map((a) => {
+                const displayName =
+                  activeSidebarItem === "sent" ? a.recipient : a.author;
                 return (
                   <div
                     key={a.id}
-                    onClick={() => navigate(`/announcement/${a.id}`, { state: { announcement: a } })}
+                    onClick={() =>
+                      navigate(`/announcement/${a.id}`, {
+                        state: { announcement: a },
+                      })
+                    }
                     className="bg-blue-100 rounded-full px-4 py-3 flex items-center justify-between animate-fadeIn cursor-pointer"
                   >
                     <div className="flex items-center w-1/3">
-                      <button onClick={e => toggleStar(a.id, e)} className="mr-2">
+                      <button
+                        onClick={(e) => toggleStar(a.id, e)}
+                        className="mr-2"
+                      >
                         <Star
                           size={16}
-                          className={starredAnnouncements[a.id] ? 'text-yellow-500 fill-yellow-500' : 'text-gray-400'}
+                          className={
+                            starredAnnouncements[a.id]
+                              ? "text-yellow-500 fill-yellow-500"
+                              : "text-gray-400"
+                          }
                         />
                       </button>
                       <span className="font-medium">{displayName}</span>
@@ -183,7 +243,10 @@ export default function AnnouncementPage() {
                     <div className="flex-1 text-center">{a.title}</div>
                     <div className="w-20 flex items-center justify-end text-right">
                       <span className="text-sm mr-3">{a.date}</span>
-                      <button onClick={e => deleteAnnouncement(a.id, e)} className="text-red-500 hover:text-red-700">
+                      <button
+                        onClick={(e) => deleteAnnouncement(a.id, e)}
+                        className="text-red-500 hover:text-red-700"
+                      >
                         <Trash2 size={16} />
                       </button>
                     </div>
@@ -196,7 +259,10 @@ export default function AnnouncementPage() {
       </div>
 
       {showComposeForm && (
-        <NewAnnouncement onClose={() => setShowComposeForm(false)} onSend={addNewAnnouncement} />
+        <NewAnnouncement
+          onClose={() => setShowComposeForm(false)}
+          onSend={addNewAnnouncement}
+        />
       )}
     </div>
   );

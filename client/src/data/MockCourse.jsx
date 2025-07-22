@@ -1,1 +1,0 @@
-// src/data/mockCourses.js

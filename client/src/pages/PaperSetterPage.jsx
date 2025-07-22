@@ -4,11 +4,13 @@ import axios from "../axios";
 import { useNavigate } from "react-router-dom";
 import SidebarAdmin from "../components/layout/SidebarAdmin";
 import NavbarAdmin from "../components/layout/NavbarAdmin";
+import SearchBar from "../components/layout/SearchBar";
 
 export default function PaperSetterPage() {
   const navigate = useNavigate();
   const location = useLocation();
   const [users, setUsers] = useState([]);
+  const [filtered, setFiltered] = useState([]);
   const [selectedUser, setSelectedUser] = useState(null);
 
   const loadUsers = async () => {
@@ -19,6 +21,18 @@ export default function PaperSetterPage() {
       ? res.data.filter((user) => user.active)
       : res.data;
     setUsers(filtered);
+    setFiltered(filtered);
+  };
+
+  const handleSearch = (term) => {
+    const lower = term.toLowerCase();
+    const results = users.filter(
+      (u) =>
+        u.username.toLowerCase().includes(lower) ||
+        `${u.firstname} ${u.lastname}`.toLowerCase().includes(lower) ||
+        u.email.toLowerCase().includes(lower)
+    );
+    setFiltered(results);
   };
 
   useEffect(() => {
@@ -35,12 +49,15 @@ export default function PaperSetterPage() {
             Paper Setters
           </h2>
 
-          <button
-            onClick={() => navigate("/admin/create?role=PAPER_SETTER")}
-            className="mb-6 bg-blue-600 text-white px-5 py-2 rounded-md hover:bg-blue-700 transition"
-          >
-            + Create Paper Setter
-          </button>
+          <div className="flex justify-between items-center mb-6">
+            <button
+              onClick={() => navigate("/admin/create?role=PAPER_SETTER")}
+              className="mb-6 bg-blue-600 text-white px-5 py-2 rounded-md hover:bg-blue-700 transition"
+            >
+              + Create Paper Setter
+            </button>
+            <SearchBar onSearch={handleSearch} />
+          </div>
 
           <div className="bg-white shadow-md rounded-xl overflow-hidden">
             <table className="w-full text-sm text-gray-700">
@@ -53,7 +70,7 @@ export default function PaperSetterPage() {
                 </tr>
               </thead>
               <tbody>
-                {users.map((user) => (
+                {filtered.map((user) => (
                   <tr
                     key={user.id}
                     onClick={() => navigate(`/admin/user/${user.id}`)}
@@ -72,13 +89,19 @@ export default function PaperSetterPage() {
                             : "bg-yellow-200 text-yellow-800"
                         }`}
                       >
-                        {user.active ? "Active" : "Pending"}
+                        {user.active ? "Active" : "Inactive"}
                       </span>
                     </td>
                   </tr>
                 ))}
               </tbody>
             </table>
+
+            {filtered.length === 0 && (
+              <div className="text-center text-gray-500 py-4">
+                No matching users found.
+              </div>
+            )}
           </div>
         </main>
       </div>
