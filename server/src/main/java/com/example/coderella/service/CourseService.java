@@ -51,6 +51,7 @@ public class CourseService {
         Course c = repo.findBySNo(sNo)
                 .orElseThrow(() -> new EntityNotFoundException("Course not found: " + sNo));
 
+        c.setName(dto.getName());   // ✅ Add this line
         c.setCode(dto.getCode());
         c.setTitle(dto.getTitle());
         c.setLevel(dto.getLevel());
@@ -62,6 +63,8 @@ public class CourseService {
 
         return repo.save(c);
     }
+
+    
 
     @Transactional(readOnly = true)
     public Course getBySNo(Long sNo) {

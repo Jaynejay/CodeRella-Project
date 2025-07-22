@@ -68,8 +68,9 @@ export default function CourseOverview() {
 
   const handleUpdate = async (sNo, data) => {
   const form = new FormData();
-  form.append("code", data.code);      // match backend
-  form.append("name", data.name);      // NEW field
+  form.append("code", data.code);
+  form.append("name", data.name);
+  form.append("title", data.title); // ✅ important line to fix the issue
   form.append("level", data.level);
   if (data.imageFile) {
     form.append("image", data.imageFile);
@@ -86,6 +87,7 @@ export default function CourseOverview() {
     setEditCourse(null);
   }
 };
+
 
 
   const handleDelete = async (sNo) => {

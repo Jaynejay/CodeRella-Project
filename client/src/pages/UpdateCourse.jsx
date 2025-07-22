@@ -1,67 +1,35 @@
-// src/pages/UpdateCourse.jsx
 import { useState, useRef, useEffect } from "react";
 import PropTypes from "prop-types";
 import { Folder, Square, ArrowDown, X } from "lucide-react";
 
 export default function UpdateCourse({ isOpen, onClose, onSubmit, course }) {
-  // ─── Form state: only S. No pre-filled ─────────────────
   const [sNo]   = useState(course.sNo ?? "");
   const [level, setLevel] = useState("");
   const [name,  setName]  = useState("");
   const [code,  setCode]  = useState("");
+  const [title, setTitle] = useState("");
   const [image, setImage] = useState(null);
 
   const levels = ["final", "5s1", "5s2", "5s3", "6s1", "6s2"];
   const fileInputRef = useRef(null);
 
-  // ─── Drag state ───────────────────────────────────────
-  const modalRef = useRef(null);
-  const [dragging, setDragging] = useState(false);
-  const [offset,   setOffset]   = useState({ x: 0, y: 0 });
-  const [origin,   setOrigin]   = useState({ x: 0, y: 0 });
-
-  const onMouseDown = (e) => {
-    if (!e.target.closest(".modal-handle")) return;
-    setDragging(true);
-    setOrigin({
-      x: e.clientX - offset.x,
-      y: e.clientY - offset.y,
-    });
-  };
-  const onMouseMove = (e) => {
-    if (!dragging) return;
-    setOffset({
-      x: e.clientX - origin.x,
-      y: e.clientY - origin.y,
-    });
-  };
-  const onMouseUp = () => dragging && setDragging(false);
-
+  // Prefill fields from course prop
   useEffect(() => {
-    window.addEventListener("mousemove", onMouseMove);
-    window.addEventListener("mouseup", onMouseUp);
-    return () => {
-      window.removeEventListener("mousemove", onMouseMove);
-      window.removeEventListener("mouseup", onMouseUp);
-    };
-  });
-
-  // ─── File handlers ────────────────────────────────────
-  const handleDragOver   = (e) => e.preventDefault();
-  const handleDrop       = (e) => {
-    e.preventDefault();
-    if (e.dataTransfer.files[0]) setImage(e.dataTransfer.files[0]);
-  };
-  const handleFileChange = (e) => {
-    if (e.target.files[0]) setImage(e.target.files[0]);
-  };
+    if (course) {
+      setLevel(course.level || "");
+      setName(course.name || "");
+      setCode(course.code || "");
+      setTitle(course.title || "");
+    }
+  }, [course]);
 
   const handleSubmit = () => {
     onSubmit({
+      name,
+      code,
+      title,
       level,
-      courseName: name,
-      courseCode: code,
-      courseImage: image
+      imageFile: image
     });
   };
 
@@ -70,22 +38,33 @@ export default function UpdateCourse({ isOpen, onClose, onSubmit, course }) {
   return (
     <div
       className="fixed inset-0 z-50"
-      onMouseDown={onMouseDown}
-      style={{ cursor: dragging ? "grabbing" : "default" }}
+      onMouseDown={(e) => {
+        if (e.target.closest(".modal-handle")) {
+          const modal = e.currentTarget.querySelector(".modal");
+          const offsetX = e.clientX - modal.getBoundingClientRect().left;
+          const offsetY = e.clientY - modal.getBoundingClientRect().top;
+          const onMouseMove = (e) => {
+            modal.style.left = `${e.clientX - offsetX}px`;
+            modal.style.top = `${e.clientY - offsetY}px`;
+          };
+          const onMouseUp = () => {
+            window.removeEventListener("mousemove", onMouseMove);
+            window.removeEventListener("mouseup", onMouseUp);
+          };
+          window.addEventListener("mousemove", onMouseMove);
+          window.addEventListener("mouseup", onMouseUp);
+        }
+      }}
     >
       {/* backdrop */}
-      <div
-        className="absolute inset-0 bg-black bg-opacity-50"
-        onClick={onClose}
-      />
+      <div className="absolute inset-0 bg-black bg-opacity-50" onClick={onClose} />
 
       {/* modal */}
       <div
-        ref={modalRef}
-        className="absolute w-full max-w-lg bg-white rounded-lg shadow-xl max-h-[90vh] overflow-y-auto"
+        className="modal absolute w-full max-w-lg bg-white rounded-lg shadow-xl max-h-[90vh] overflow-y-auto"
         style={{
-          top: `calc(50% + ${offset.y}px)`,
-          left: `calc(50% + ${offset.x}px)`,
+          top: "50%",
+          left: "50%",
           transform: "translate(-50%, -50%)",
         }}
       >
@@ -99,7 +78,7 @@ export default function UpdateCourse({ isOpen, onClose, onSubmit, course }) {
 
         {/* body */}
         <div className="p-8 space-y-6">
-          {/* S. No (readonly) */}
+          {/* S. No */}
           <div>
             <label className="block mb-2 text-sm font-medium">S. No:</label>
             <input
@@ -112,9 +91,7 @@ export default function UpdateCourse({ isOpen, onClose, onSubmit, course }) {
 
           {/* Level */}
           <div>
-            <label className="block mb-2 text-sm font-medium">
-              Level of the course:
-            </label>
+            <label className="block mb-2 text-sm font-medium">Level of the course:</label>
             <select
               value={level}
               onChange={(e) => setLevel(e.target.value)}
@@ -122,9 +99,7 @@ export default function UpdateCourse({ isOpen, onClose, onSubmit, course }) {
             >
               <option value="" disabled>— Select level —</option>
               {levels.map((lvl) => (
-                <option key={lvl} value={lvl}>
-                  {lvl.toUpperCase()}
-                </option>
+                <option key={lvl} value={lvl}>{lvl.toUpperCase()}</option>
               ))}
             </select>
           </div>
@@ -153,11 +128,21 @@ export default function UpdateCourse({ isOpen, onClose, onSubmit, course }) {
             />
           </div>
 
-          {/* Image */}
+          {/* Title (NEW) */}
           <div>
-            <label className="block mb-2 text-sm font-medium">
-              Upload the image of the relevant course:
-            </label>
+            <label className="block mb-2 text-sm font-medium">Course Title:</label>
+            <input
+              type="text"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              placeholder="Enter course title"
+              className="w-full px-4 py-3 border border-gray-300 rounded-md"
+            />
+          </div>
+
+          {/* Image upload */}
+          <div>
+            <label className="block mb-2 text-sm font-medium">Upload image of the course:</label>
             <div className="flex gap-3 mb-3">
               <button
                 onClick={() => fileInputRef.current.click()}
@@ -171,33 +156,30 @@ export default function UpdateCourse({ isOpen, onClose, onSubmit, course }) {
               >
                 <Square size={20} className="text-blue-600" />
               </button>
-              <span className="text-xs text-gray-500 self-center">
-                Max 2 MB, 1 file
-              </span>
+              <span className="text-xs text-gray-500 self-center">Max 2 MB, 1 file</span>
             </div>
             <input
               type="file"
               ref={fileInputRef}
-              onChange={handleFileChange}
+              onChange={(e) => setImage(e.target.files[0])}
               className="hidden"
               accept="image/*"
             />
             <div
-              onDragOver={handleDragOver}
-              onDrop={handleDrop}
+              onDragOver={(e) => e.preventDefault()}
+              onDrop={(e) => {
+                e.preventDefault();
+                if (e.dataTransfer.files[0]) setImage(e.dataTransfer.files[0]);
+              }}
               onClick={() => fileInputRef.current.click()}
               className="border-2 border-dashed border-gray-200 rounded-md p-8 flex flex-col items-center justify-center cursor-pointer"
             >
               {image ? (
-                <p className="text-sm text-gray-600">
-                  Selected: {image.name}
-                </p>
+                <p className="text-sm text-gray-600">Selected: {image.name}</p>
               ) : (
                 <>
                   <ArrowDown size={32} className="text-gray-400 mb-4" />
-                  <p className="text-sm text-gray-600">
-                    You can drag & drop files here.
-                  </p>
+                  <p className="text-sm text-gray-600">You can drag & drop files here.</p>
                 </>
               )}
             </div>
@@ -230,5 +212,9 @@ UpdateCourse.propTypes = {
   onSubmit: PropTypes.func.isRequired,
   course:   PropTypes.shape({
     sNo:    PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    level:  PropTypes.string,
+    name:   PropTypes.string,
+    code:   PropTypes.string,
+    title:  PropTypes.string
   }).isRequired,
 };
