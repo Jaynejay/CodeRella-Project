@@ -112,14 +112,7 @@ function App() {
         <Route path="/edit-profile" element={<EditProfilePage />} />
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
         <Route path="/reset-password" element={<ResetPasswordPage />} />
-        <Route
-          path="/admin/user/:id"
-          element={
-            <ProtectedRoute allowedRoles={["SUPER_ADMIN"]}>
-              <UserDetailsPage />
-            </ProtectedRoute>
-          }
-        />
+        <Route path="/admin/user/:id" element={<UserDetailsPage />} />
         <Route
           path="/admin/activity"
           element={
@@ -136,14 +129,7 @@ function App() {
             </ProtectedRoute>
           }
         />
-        <Route
-          path="/admin/user/:id/edit"
-          element={
-            <ProtectedRoute allowedRoles={["SUPER_ADMIN"]}>
-              <EditUserPage />
-            </ProtectedRoute>
-          }
-        />
+        <Route path="/admin/user/:id/edit" element={<EditUserPage />} />
 
         {/* Admin dashboard */}
         <Route
