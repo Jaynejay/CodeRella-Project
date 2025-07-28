@@ -211,7 +211,7 @@ export default function UserDetailsPage() {
                         }
                       }
                     }}
-                    className="w-40 bg-red-600 text-white px-5 py-2 rounded-lg hover:bg-red-700 transition duration-200"
+                    className="bg-red-600 text-white px-5 py-2 rounded-lg hover:bg-red-700 transition duration-200"
                   >
                     Delete User
                   </button>
