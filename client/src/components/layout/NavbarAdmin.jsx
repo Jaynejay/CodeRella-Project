@@ -46,9 +46,9 @@ const NavbarAdmin = () => {
 
             <li className="mx-8">
               <Link
-                to="/admin/paper-setters"
+                to="/admin/user-accounts"
                 className={`${
-                  location.pathname === "/admin/paper-setters"
+                  location.pathname === "/admin/user-accounts"
                     ? "text-blue-600"
                     : "text-gray-800"
                 } hover:text-blue-600 hover:border-b-2 hover:border-blue-600`}

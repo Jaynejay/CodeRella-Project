@@ -22,13 +22,18 @@ export default function LoginPage() {
       localStorage.setItem("firstLogin", res.data.firstLogin);
 
       // Navigate based on role and profile status
-      if (!res.data.profileCompleted) {
+      if (res.data.scheduledForDeletion) {
+        alert(
+          "Your account is scheduled for deletion. Please contact admin to restore access."
+        );
+        return;
+      } else if (!res.data.profileCompleted) {
         navigate("/complete-profile");
       } else if (!res.data.active) {
         alert("Your account is pending admin approval.");
         return;
       } else if (res.data.firstLogin) {
-        navigate("/reset-password");
+        navigate("/change-password");
       } else {
         switch (res.data.role) {
           case "SUPER_ADMIN":

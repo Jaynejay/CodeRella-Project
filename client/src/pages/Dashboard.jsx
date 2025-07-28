@@ -57,7 +57,7 @@ export default function Dashboard() {
                       alt={c.title}
                       className="absolute inset-0 h-full w-full object-cover"
                     />
-                    <span className="absolute top-1 left-1 rounded  bg-blue-800 px-2 py-0.5 text-xs font-semibold text-white">
+                    <span className="absolute top-1 left-1 rounded bg-blue-800 px-2 py-0.5 text-xs font-semibold text-white">
                       {c.level}
                     </span>
                   </div>

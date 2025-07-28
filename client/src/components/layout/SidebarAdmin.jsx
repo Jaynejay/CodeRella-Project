@@ -21,7 +21,7 @@ export default function SidebarAdmin() {
         </NavLink>
 
         <NavLink
-          to="/examadmin"
+          to="/admin/exam-admins"
           className={({ isActive }) =>
             `flex items-center px-4 py-2 rounded-md hover:bg-blue-100 transition hover:text-blue-700 ${
               isActive ? "bg-blue-100 font-medium text-blue-700" : ""
@@ -33,7 +33,7 @@ export default function SidebarAdmin() {
         </NavLink>
 
         <NavLink
-          to="/courseadmin"
+          to="/admin/course-admins"
           className={({ isActive }) =>
             `flex items-center px-4 py-2 rounded-md hover:bg-blue-100 transition hover:text-blue-700 ${
               isActive ? "bg-blue-100 font-medium text-blue-700" : ""
@@ -45,7 +45,7 @@ export default function SidebarAdmin() {
         </NavLink>
 
         <NavLink
-          to="/payment"
+          to="/admin/payment-coordinators"
           className={({ isActive }) =>
             `flex items-center px-4 py-2 rounded-md hover:bg-blue-100 transition hover:text-blue-700 ${
               isActive ? "bg-blue-100 font-medium text-blue-700" : ""

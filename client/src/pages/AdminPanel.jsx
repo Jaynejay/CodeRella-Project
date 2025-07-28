@@ -30,6 +30,23 @@ export default function AdminPanel() {
     loadPending(); // reload list after approval
   };
 
+  const decline = async (id) => {
+    if (
+      !window.confirm(
+        "Are you sure you want to decline this request? This action cannot be undone."
+      )
+    )
+      return;
+    try {
+      await axios.delete(`/admin/decline/${id}`);
+      alert("Declined!");
+      loadPending(); // reload list after decline
+    } catch (err) {
+      console.error("Failed to decline user:", err);
+      alert("Failed to decline user.");
+    }
+  };
+
   // Load pending users on initial render
   useEffect(() => {
     loadPending();
@@ -42,7 +59,7 @@ export default function AdminPanel() {
         <NavbarAdmin />
       </header>
 
-      <div className="flex flex-1">
+      <div className="flex flex-1 mb-8">
         <main className="pt-20 px-20 w-full grid grid-cols-1 lg:grid-cols-4 gap-6">
           <h1 className="text-2xl font-bold text-gray-800 col-span-4">
             Dashboard
@@ -84,21 +101,28 @@ export default function AdminPanel() {
               <div className="bg-white p-6 rounded-2xl shadow-md">
                 <div className="flex justify-between mb-3">
                   <h2 className="text-lg font-semibold">Pending Requests</h2>
+                  <button
+                    onClick={() => navigate("/admin/pending")}
+                    className="text-sm text-blue-600 hover:underline hover:text-blue-800 transition"
+                  >
+                    View All
+                  </button>
                 </div>
-                <div className="space-y-3">
+
+                <div className="overflow-x-auto">
                   <table className="w-full border-collapse text-sm text-left">
                     <thead>
                       <tr className="bg-gray-200">
-                        <th className="bg-gray-100 text-gray-700 font-medium px-4 py-2">
+                        <th className="bg-gray-100 text-gray-700 font-medium px-4 py-2 whitespace-nowrap">
                           Username
                         </th>
-                        <th className="bg-gray-100 text-gray-700 font-medium px-4 py-2">
+                        <th className="bg-gray-100 text-gray-700 font-medium px-4 py-2 whitespace-nowrap">
                           Name
                         </th>
-                        <th className="bg-gray-100 text-gray-700 font-medium px-4 py-2">
+                        <th className="bg-gray-100 text-gray-700 font-medium px-4 py-2 whitespace-nowrap">
                           Email
                         </th>
-                        <th className="bg-gray-100 text-gray-700 font-medium px-4 py-2">
+                        <th className="bg-gray-100 text-gray-700 font-medium px-4 py-2 whitespace-nowrap">
                           Action
                         </th>
                       </tr>
@@ -106,61 +130,80 @@ export default function AdminPanel() {
                     <tbody>
                       {pendingUsers.slice(0, 3).map((user) => (
                         <tr key={user.id}>
-                          <td className="px-4 py-2 text-gray-700">
+                          <td className="px-4 py-2 text-gray-700 whitespace-nowrap">
                             {user.username}
                           </td>
-                          <td className="px-4 py-2 text-gray-700">
+                          <td className="px-4 py-2 text-gray-700 whitespace-nowrap">
                             {user.firstname} {user.lastname}
                           </td>
-                          <td className="px-4 py-2 text-gray-700">
+                          <td className="px-4 py-2 text-gray-700 whitespace-nowrap">
                             {user.email}
                           </td>
-                          <td className="px-4 py-2 text-gray-700">
+                          <td className="px-4 py-2 text-gray-700 whitespace-nowrap space-x-2">
                             <button
                               onClick={() => approve(user.id)}
                               className="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600"
                             >
                               Approve
                             </button>
+                            <button
+                              onClick={() => decline(user.id)}
+                              className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
+                            >
+                              Decline
+                            </button>
                           </td>
                         </tr>
                       ))}
                     </tbody>
                   </table>
-
-                  <button
-                    onClick={() => navigate("/admin/pending")}
-                    className="mt-4 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-semibold"
-                  >
-                    View All
-                  </button>
                 </div>
               </div>
             </div>
 
             {/* Recent Activities */}
-            <div className="bg-white p-6 rounded-2xl shadow">
-              <div className="flex justify-between mb-3">
+            <div className="bg-white p-6 rounded-2xl shadow-md">
+              <div className="flex justify-between items-center mb-4">
                 <h2 className="text-lg font-semibold">
                   Recent User Activities
                 </h2>
                 <button
-                  onClick={() => navigate("/admin/activities")}
-                  className="text-blue-600 text-sm font-medium"
+                  onClick={() => navigate("/admin/activity")}
+                  className="text-sm text-blue-600 hover:underline hover:text-blue-800 transition"
                 >
                   View All
                 </button>
               </div>
-              <ul className="space-y-2">
-                {activities.slice(0, 3).map((activity, index) => (
-                  <li key={index} className="text-gray-700 text-sm">
-                    <strong>{activity.username}</strong> {activity.action} -{" "}
-                    <span className="text-gray-500 text-xs">
-                      {new Date(activity.timestamp).toLocaleString()}
-                    </span>
-                  </li>
-                ))}
-              </ul>
+
+              {activities.length === 0 ? (
+                <p className="text-gray-500 text-sm">No recent activities.</p>
+              ) : (
+                <ul className="space-y-3">
+                  {activities.slice(0, 3).map((activity, index) => (
+                    <li
+                      key={index}
+                      className="bg-gray-50 p-4 rounded-lg shadow-sm hover:shadow transition"
+                    >
+                      <div className="flex justify-between items-center mb-1">
+                        <p className="text-sm text-gray-800">
+                          <strong className="text-blue-700">
+                            {activity.username}
+                          </strong>{" "}
+                          {activity.action}
+                        </p>
+                        <span className="text-xs text-gray-500">
+                          {new Date(activity.timestamp).toLocaleString()}
+                        </span>
+                      </div>
+                      {activity.details && (
+                        <p className="text-sm text-gray-600">
+                          {activity.details}
+                        </p>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              )}
             </div>
           </section>
 
