@@ -1,12 +1,22 @@
+// src/components/ProtectedRoute.jsx
+import React from "react";
 import { Navigate } from "react-router-dom";
-import { useUser } from "../context/UserContext";
 
-export default function ProtectedRoute({ allowedRoles, children }) {
-  const { user } = useUser(); // assumes your context provides user with `role`
+const ProtectedRoute = ({ allowedRoles, children }) => {
+  const storedRole = localStorage.getItem("role");
 
-  if (!user || !allowedRoles.includes(user.role)) {
-    return <Navigate to="/unauthorized" replace />;
+  if (!storedRole) {
+    // Not logged in or no role found — redirect to login
+    return <Navigate to="/" />;
   }
 
+  if (!allowedRoles.includes(storedRole)) {
+    // Logged in but role is not allowed — redirect to unauthorized page
+    return <Navigate to="/unauthorized" />;
+  }
+
+  // Role is allowed — render child components
   return children;
-}
+};
+
+export default ProtectedRoute;
