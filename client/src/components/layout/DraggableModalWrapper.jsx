@@ -1,5 +1,5 @@
-import { useState, useRef } from 'react';
-import PropTypes from 'prop-types';
+import { useState, useRef } from "react";
+import PropTypes from "prop-types";
 
 /**
  * Wrap your modal card in this to make it draggable.
@@ -10,11 +10,11 @@ const DraggableModalWrapper = ({ children }) => {
   const start = useRef({ x: 0, y: 0 });
 
   const onMouseDown = (e) => {
-    const handle = e.target.closest('[data-drag-handle]');
+    const handle = e.target.closest("[data-drag-handle]");
     if (!handle) return;
     start.current = { x: e.clientX - pos.x, y: e.clientY - pos.y };
-    window.addEventListener('mousemove', onMouseMove);
-    window.addEventListener('mouseup', onMouseUp);
+    window.addEventListener("mousemove", onMouseMove);
+    window.addEventListener("mouseup", onMouseUp);
     e.preventDefault();
   };
 
@@ -22,8 +22,8 @@ const DraggableModalWrapper = ({ children }) => {
     setPos({ x: e.clientX - start.current.x, y: e.clientY - start.current.y });
 
   const onMouseUp = () => {
-    window.removeEventListener('mousemove', onMouseMove);
-    window.removeEventListener('mouseup', onMouseUp);
+    window.removeEventListener("mousemove", onMouseMove);
+    window.removeEventListener("mouseup", onMouseUp);
   };
 
   return (
@@ -31,9 +31,9 @@ const DraggableModalWrapper = ({ children }) => {
       onMouseDown={onMouseDown}
       /* 1st translate centres, 2nd applies drag offsets */
       style={{
-        position: 'absolute',
-        left: '50%',
-        top: '50%',
+        position: "absolute",
+        left: "50%",
+        top: "50%",
         transform: `translate(-50%, -50%) translate(${pos.x}px, ${pos.y}px)`,
       }}
     >

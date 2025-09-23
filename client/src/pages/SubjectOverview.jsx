@@ -261,7 +261,7 @@ export default function SubjectOverview() {
             subjectCode: selected.code,
             subjectName: selected.title,
             newLevel: '',
-            newCourseName: '',
+            newCourseName: '',https://github.com/Jaynejay/CodeRella-Project/pull/24/conflict?name=client%252Fsrc%252Fpages%252FSubjectOverview.jsx&ancestor_oid=1280545a26c54a3b5ebb1fd26cbc89877d09b7bc&base_oid=7136c731f022c6910e5a737d195440de2676c168&head_oid=9dc1a79503549e3a31d64f8c3ae8106769c4f963
             files: []
           }}
         />

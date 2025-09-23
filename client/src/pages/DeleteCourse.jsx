@@ -1,13 +1,18 @@
-// src/pages/DeleteCourse.jsx
-import PropTypes from "prop-types";
+import { useState } from 'react';
+import PropTypes from 'prop-types';
 
-const DeleteCourse = ({ isOpen, onClose, onDelete, course }) => {
-  console.log("DeleteCourse rendered", isOpen, course);
+const DeleteCourse = ({ isOpen, onClose, onDelete }) => {
+  const [courseCode, setCourseCode] = useState('');
+  const [courseLevel, setCourseLevel] = useState('');
+  const [courseName, setCourseName] = useState('');
 
-  if (!isOpen || !course) return null;
+  // Log to check if it's rendered
+  console.log('DeleteCourse rendered', isOpen);
+
+  if (!isOpen) return null;
 
   const handleDelete = () => {
-    onDelete(course.id);
+    onDelete({ courseCode, courseLevel, courseName });
     onClose();
   };
 
@@ -17,67 +22,45 @@ const DeleteCourse = ({ isOpen, onClose, onDelete, course }) => {
         {/* Title Bar */}
         <div className="bg-blue-800 text-white px-6 py-4 flex justify-between items-center sticky top-0 z-10">
           <h2 className="text-xl font-semibold">Deleting Course</h2>
-          <button onClick={onClose} className="text-white text-xl font-bold">
-            ✕
-          </button>
+          <button onClick={onClose} className="text-white text-xl font-bold">✕</button>
         </div>
 
         {/* Body */}
         <div className="p-8 space-y-6">
-          {/* S. No */}
-          <div>
-            <label className="block mb-1 text-sm font-medium">S. No:</label>
-            <input
-              type="text"
-              value={course.sNo ?? ""}
-              disabled
-              className="w-full px-4 py-2 border border-gray-300 rounded-md bg-gray-100 cursor-not-allowed"
-            />
-          </div>
-
-          {/* Course Code */}
           <div>
             <label className="block mb-1 text-sm font-medium">Course Code:</label>
             <input
               type="text"
-              value={course.code ?? ""}
-              disabled
-              className="w-full px-4 py-2 border border-gray-300 rounded-md bg-gray-100 cursor-not-allowed"
+              value={courseCode}
+              onChange={(e) => setCourseCode(e.target.value)}
+              className="w-full px-4 py-2 border border-gray-300 rounded-md"
             />
           </div>
 
-          {/* Course Level */}
           <div>
-            <label className="block mb-1 text-sm font-medium">
-              Level of the Course:
-            </label>
+            <label className="block mb-1 text-sm font-medium">Level of the Course:</label>
             <input
               type="text"
-              value={course.level ?? ""}
-              disabled
-              className="w-full px-4 py-2 border border-gray-300 rounded-md bg-gray-100 cursor-not-allowed"
+              value={courseLevel}
+              onChange={(e) => setCourseLevel(e.target.value)}
+              className="w-full px-4 py-2 border border-gray-300 rounded-md"
             />
           </div>
 
-          {/* Course Name */}
           <div>
             <label className="block mb-1 text-sm font-medium">Course Name:</label>
             <input
               type="text"
-              value={course.title ?? ""}
-              disabled
-              className="w-full px-4 py-2 border border-gray-300 rounded-md bg-gray-100 cursor-not-allowed"
+              value={courseName}
+              onChange={(e) => setCourseName(e.target.value)}
+              className="w-full px-4 py-2 border border-gray-300 rounded-md"
             />
           </div>
 
           {/* Confirmation Box */}
           <div className="mt-12 border border-gray-200 rounded-lg p-6">
-            <h3 className="text-center font-medium text-lg mb-2">
-              Delete this course?
-            </h3>
-            <p className="text-center text-gray-600 mb-6">
-              Are you sure you want to delete this course?
-            </p>
+            <h3 className="text-center font-medium text-lg mb-2">Delete this course?</h3>
+            <p className="text-center text-gray-600 mb-6">Are you sure you want to delete this course?</p>
 
             <div className="flex justify-center gap-4">
               <button
@@ -101,16 +84,9 @@ const DeleteCourse = ({ isOpen, onClose, onDelete, course }) => {
 };
 
 DeleteCourse.propTypes = {
-  isOpen:   PropTypes.bool.isRequired,
-  onClose:  PropTypes.func.isRequired,
+  isOpen: PropTypes.bool.isRequired,
+  onClose: PropTypes.func.isRequired,
   onDelete: PropTypes.func.isRequired,
-  course:   PropTypes.shape({
-    id:    PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
-    sNo:   PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-    code:  PropTypes.string,
-    level: PropTypes.string,
-    title: PropTypes.string,
-  }).isRequired,
 };
 
 export default DeleteCourse;

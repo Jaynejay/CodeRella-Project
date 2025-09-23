@@ -1,19 +1,39 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import axios from "../axios";
 import NavbarAdmin from "../components/layout/NavbarAdmin";
 import SidebarAdmin from "../components/layout/SidebarAdmin";
 
 export default function UserDetailsPage() {
   const { id } = useParams();
+  const navigate = useNavigate();
   const [user, setUser] = useState(null);
+  const [imageUrl, setImageUrl] = useState("");
 
   useEffect(() => {
     const loadUser = async () => {
       try {
-        const res = await axios.get(`/admin/users?role=PAPER_SETTER`);
-        const found = res.data.find((u) => u.id === parseInt(id));
-        setUser(found);
+        const token = localStorage.getItem("token");
+        const res = await axios.get(`/admin/users/${id}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        setUser(res.data);
+        try {
+          const imageRes = await axios.get(`/admin/users/${id}/profile-image`, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+            responseType: "blob", // This is important
+          });
+
+          const imageBlobUrl = URL.createObjectURL(imageRes.data);
+          setImageUrl(imageBlobUrl);
+        } catch (imageErr) {
+          console.warn("No profile image found. Using default.");
+          setImageUrl("/default-avatar.png"); // Use a placeholder
+        }
       } catch (err) {
         console.error("Failed to load user:", err);
       }
@@ -33,9 +53,17 @@ export default function UserDetailsPage() {
           <div className="max-w-5xl mx-auto p-10 bg-white shadow-2xl rounded-2xl">
             {/* Profile Header */}
             <div className="flex flex-col items-center mb-12">
-              <div className="w-32 h-32 rounded-full bg-gray-300 flex items-center justify-center text-gray-600 text-2xl font-extrabold shadow-inner border">
-                {user.firstname?.charAt(0)}
-              </div>
+              {imageUrl ? (
+                <img
+                  src={imageUrl}
+                  alt="Profile"
+                  className="w-32 h-32 rounded-full object-cover border-4 border-blue-500 shadow-lg"
+                />
+              ) : (
+                <div className="w-32 h-32 rounded-full bg-gray-300 flex items-center justify-center text-gray-600 text-2xl font-extrabold shadow-inner border">
+                  {user.firstname?.charAt(0)}
+                </div>
+              )}
               <h2 className="text-3xl font-bold mt-4 text-blue-800">
                 {user.firstname} {user.lastname}
               </h2>
@@ -142,13 +170,78 @@ export default function UserDetailsPage() {
               </div>
             </div>
 
-            <div className="mt-10 flex justify-end">
+            <div className="mt-10 flex justify-end space-x-4">
               <button
-                onClick={() => navigate(`/admin/user/${id}/edit`)}
+                onClick={() => navigate(`/admin/user/${user.id}/edit`)}
                 className="bg-blue-600 text-white px-5 py-2 rounded-lg hover:bg-blue-700 transition duration-200"
               >
                 Edit Profile
               </button>
+
+              {user.scheduledForDeletion && (
+                <div className="mt-4 p-3 bg-yellow-100 border-l-4 border-yellow-600 text-yellow-800 rounded">
+                  <strong>Scheduled for deletion:</strong>{" "}
+                  {new Date(user.deletionScheduledAt).toLocaleDateString()}
+                </div>
+              )}
+
+              <div className="mt-4 flex justify-end space-x-4">
+                {!user.scheduledForDeletion ? (
+                  <button
+                    onClick={async () => {
+                      if (
+                        confirm("Are you sure you want to delete this user?")
+                      ) {
+                        try {
+                          const token = localStorage.getItem("token");
+                          await axios.put(
+                            `/admin/users/${user.id}/delete`,
+                            null,
+                            {
+                              headers: {
+                                Authorization: `Bearer ${token}`,
+                              },
+                            }
+                          );
+                          alert("User scheduled for deletion.");
+                          window.location.reload();
+                        } catch (err) {
+                          console.error(err);
+                          alert("Failed to delete user.");
+                        }
+                      }
+                    }}
+                    className="bg-red-600 text-white px-5 py-2 rounded-lg hover:bg-red-700 transition duration-200"
+                  >
+                    Delete User
+                  </button>
+                ) : (
+                  <button
+                    onClick={async () => {
+                      try {
+                        const token = localStorage.getItem("token");
+                        await axios.put(
+                          `/admin/users/${user.id}/undo-delete`,
+                          null,
+                          {
+                            headers: {
+                              Authorization: `Bearer ${token}`,
+                            },
+                          }
+                        );
+                        alert("Deletion undone. User reactivated.");
+                        window.location.reload();
+                      } catch (err) {
+                        console.error(err);
+                        alert("Failed to undo deletion.");
+                      }
+                    }}
+                    className="bg-yellow-500 text-white px-5 py-2 rounded-lg hover:bg-yellow-600 transition duration-200"
+                  >
+                    Undo Delete
+                  </button>
+                )}
+              </div>
             </div>
           </div>
         </main>
