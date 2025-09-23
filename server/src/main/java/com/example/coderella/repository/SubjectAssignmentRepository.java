@@ -23,4 +23,7 @@ public interface SubjectAssignmentRepository extends JpaRepository<SubjectAssign
 
     // ✅ Remove assignment by subject + paper setter
     void deleteBySubjectCodeAndPaperSetterRegistrationId(String subjectCode, String registrationId);
+
+    // ✅ NEW: remove *all* assignments that reference this subject
+    void deleteBySubjectCode(String subjectCode);
 }

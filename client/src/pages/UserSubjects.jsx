@@ -44,7 +44,7 @@ export default function UserSubjects() {
             {subjects.map((sub) => (
               <Link
                 key={sub.id}
-                to={`/subject/${sub.id}`}
+                to={`/subject/${sub.id}/add-submission`}
                 className="block relative bg-white rounded-lg shadow-md overflow-hidden group"
               >
                 <div className="w-full h-48 bg-gray-200 overflow-hidden">

@@ -17,6 +17,10 @@ import PaymentCoordinatorPage from "./pages/PaymentCoordinatorPage";
 import CourseAdminPage from "./pages/CourseAdminPage";
 import PendingRequests from "./pages/PendingRequests";
 import CreateUserPage from "./pages/CreateUserPage";
+import AddSubmissionPage from "./pages/AddSubmissionPage";
+
+// Inside your <Routes>
+
 
 // Dev / User Dashboard
 // import LoginPage from "./pages/LoginPage";
@@ -144,6 +148,8 @@ function App() {
               </>
             }
           />
+          <Route path="/subject/:subjectCode/add-submission" element={<AddSubmissionPage />} />
+
           <Route
             path="/announcement/:id"
             element={
