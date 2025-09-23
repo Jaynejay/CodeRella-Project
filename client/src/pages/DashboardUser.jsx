@@ -141,6 +141,11 @@ export default function DashboardUser() {
                       alt={c.title}
                       className="absolute inset-0 h-full w-full object-cover"
                     />
+                    <img
+                      src={c.cover}
+                      alt={c.title}
+                      className="absolute inset-0 h-full w-full object-cover"
+                    />
                     <span className="absolute top-1 left-1 rounded bg-blue-800 px-2 py-0.5 text-xs font-semibold text-white">
                       {c.level}
                     </span>
@@ -153,6 +158,7 @@ export default function DashboardUser() {
             </div>
 
             {/* ─ Calendar with assignments details ─ */}
+            {/* ─ Calendar with assignments details ─ */}
             <div className="mb-8">
               <Calendar
                 events={calendarEvents}
@@ -161,6 +167,7 @@ export default function DashboardUser() {
             </div>
 
             {/* ─ Latest announcements ─ */}
+            {/* ─ Latest announcements ─ */}
             <section>
               <h2 className="mb-2 text-lg font-semibold">
                 Latest announcements
@@ -168,6 +175,11 @@ export default function DashboardUser() {
               <ul className="divide-y text-sm">
                 {announcements.map((a) => (
                   <li key={a.id}>
+                    <Link
+                      to={`/userannouncements/${a.id}`}
+                      state={{ announcement: a }}
+                      className="block py-2 hover:bg-gray-100"
+                    >
                     <Link
                       to={`/userannouncements/${a.id}`}
                       state={{ announcement: a }}
@@ -193,6 +205,7 @@ export default function DashboardUser() {
 
       <Footer />
 
+      {/* ─ Deadline popup ─ */}
       {/* ─ Deadline popup ─ */}
       {showDeadline && selectedEvent && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">

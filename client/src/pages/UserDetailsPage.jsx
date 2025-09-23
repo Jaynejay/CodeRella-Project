@@ -173,7 +173,7 @@ export default function UserDetailsPage() {
             <div className="mt-10 flex justify-end space-x-4">
               <button
                 onClick={() => navigate(`/admin/user/${user.id}/edit`)}
-                className="w-40 bg-blue-600 text-white px-5 py-1 rounded-lg hover:bg-blue-700 transition duration-200"
+                className="bg-blue-600 text-white px-5 py-2 rounded-lg hover:bg-blue-700 transition duration-200"
               >
                 Edit Profile
               </button>
