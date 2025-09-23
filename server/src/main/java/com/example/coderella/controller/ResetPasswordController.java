@@ -30,7 +30,8 @@ public class ResetPasswordController {
                                                 @RequestParam String newPassword,
                                                 Authentication auth) {
         String username = auth.getName();
-        User user = Optional.ofNullable(userRepository.findByUsername(username))
+        User user = userRepository.findByUsername(username) // I changed here User user = userRepository.findByUsername(username)
+                //.orElseThrow(() -> new RuntimeException("User not found"));
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         // 1. Validate current password

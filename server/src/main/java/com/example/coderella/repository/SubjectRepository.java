@@ -2,19 +2,23 @@ package com.example.coderella.repository;
 
 import com.example.coderella.entity.Subject;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
 
-@Repository
-public interface SubjectRepository extends JpaRepository<Subject, Long> {
-    // list all subjects of a given course by its sNo
-    List<Subject> findByCourse_SNo(Long sNo);
+public interface SubjectRepository extends JpaRepository<Subject, String> {
+    // list all for a course (unchanged)
+    List<Subject> findByCourse_Code(String courseCode);
 
-    // find one subject by course-sNo AND its unique code
-    Optional<Subject> findByCourse_SNoAndCode(Long sNo, String code);
+    // lookup one by its code under that course
+    Optional<Subject> findByCourse_CodeAndCode(String courseCode, String code);
 
-    // delete one subject by course-sNo AND its unique code
-    void deleteByCourse_SNoAndCode(Long sNo, String code);
+    // delete by course+code
+    void deleteByCourse_CodeAndCode(String courseCode, String code);
+
+    // optional exists check
+    boolean existsByCourse_CodeAndCode(String courseCode, String code);
+
+    // ✅ FIXED
+    Optional<Subject> findByCode(String subjectCode);
 }

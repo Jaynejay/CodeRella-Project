@@ -1,37 +1,41 @@
+// AnnouncementService.java
 package com.example.coderella.service;
 
 import com.example.coderella.entity.Announcement;
 import com.example.coderella.repository.AnnouncementRepository;
+import com.example.coderella.dto.AnnouncementDto;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class AnnouncementService {
+    private final AnnouncementRepository repo;
+    private final PaperSetterAnnouncementService psaService;
 
-    private final AnnouncementRepository announcementRepository;
+    public Announcement save(AnnouncementDto dto) {
+        // Use no-arg constructor then setters to avoid missing multi-arg constructor
+        Announcement ann = new Announcement();
+        ann.setAuthor(dto.getAuthor());
+        ann.setTitle(dto.getTitle());
+        ann.setMessage(dto.getMessage());
+        ann.setDate(LocalDate.now());
 
-    public AnnouncementService(AnnouncementRepository announcementRepository) {
-        this.announcementRepository = announcementRepository;
+        Announcement saved = repo.save(ann);
+
+        // Propagate to paper-setter announcements
+        dto.getRecipientUsernames().forEach(username ->
+                psaService.createFromManager(
+                        saved.getTitle(), saved.getMessage(), saved.getAuthor(), username
+                )
+        );
+
+        return saved;
     }
 
-    // Save a new announcement
-    public Announcement saveAnnouncement(Announcement announcement) {
-        return announcementRepository.save(announcement);
-    }
-
-    // Retrieve all announcements
-    public List<Announcement> getAllAnnouncements() {
-        return announcementRepository.findAll();
-    }
-
-    // Retrieve announcements for a specific recipient username
-    public List<Announcement> getAnnouncementsForRecipient(String recipientUsername) {
-        return announcementRepository.findByRecipientUsername(recipientUsername);
-    }
-
-    // Delete an announcement by ID
-    public void deleteAnnouncement(Long id) {
-        announcementRepository.deleteById(id);
+    public List<Announcement> listAll() {
+        return repo.findAll();
     }
 }

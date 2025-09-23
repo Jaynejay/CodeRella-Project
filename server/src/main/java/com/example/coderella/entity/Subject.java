@@ -3,16 +3,12 @@ package com.example.coderella.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
 @Entity
 @Table(name = "subjects")
+@Getter @Setter
+@NoArgsConstructor @AllArgsConstructor
 public class Subject {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(nullable = false, unique = true)
@@ -20,9 +16,6 @@ public class Subject {
 
     @Column(nullable = false)
     private String title;
-
-    @Column(nullable = false)
-    private String level;
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "course_id", nullable = false)

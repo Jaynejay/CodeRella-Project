@@ -5,12 +5,11 @@ import DraggableModalWrapper from '../components/layout/DraggableModalWrapper'; 
 const UpdateSubject = ({ onClose, onSubmit, initialData = {} }) => {
   /* ───────── state ───────── */
   const [formData, setFormData] = useState({
-    courseCode:    initialData.courseCode    || '',
-    subjectCode:   initialData.subjectCode   || '',
-    newLevel:      initialData.newLevel      || '',
-    newCourseName: initialData.newCourseName || '',
-    subjectName:   initialData.subjectName   || '',
-    files:         initialData.files         || [],
+    courseCode:  initialData.courseCode  || '',
+    subjectCode: initialData.subjectCode || '',
+    // subjectName no longer auto-fills; start empty
+    subjectName: '',
+    files:       initialData.files       || [],
   });
 
   const fileInputRef = useRef(null);
@@ -52,17 +51,30 @@ const UpdateSubject = ({ onClose, onSubmit, initialData = {} }) => {
               data-drag-handle
               className="flex cursor-move items-center justify-between rounded-t-lg bg-[#151d87] px-6 py-3 text-white select-none"
             >
-              <h2 className="text-lg font-semibold">Updating Subjects</h2>
+              <h2 className="text-lg font-semibold">Update Subject</h2>
               <button onClick={onClose} className="text-xl leading-none hover:opacity-80">×</button>
             </div>
 
             {/* form */}
             <form onSubmit={submitForm} className="space-y-6 rounded-b-lg bg-gray-50 px-10 pb-8 pt-6">
-              <Input label="Course code:"            name="courseCode"    value={formData.courseCode}    onChange={updateField} />
-              <Input label="Subject Code:"           name="subjectCode"   value={formData.subjectCode}   onChange={updateField} />
-              <Input label="New level of the course:" name="newLevel"      value={formData.newLevel}      onChange={updateField} />
-              <Input label="New Course Name:"        name="newCourseName" value={formData.newCourseName} onChange={updateField} />
-              <Input label="Subject Name:"           name="subjectName"   value={formData.subjectName}   onChange={updateField} />
+              <Input
+                label="Course code:"
+                name="courseCode"
+                value={formData.courseCode}
+                onChange={updateField}
+              />
+              <Input
+                label="Subject Code:"
+                name="subjectCode"
+                value={formData.subjectCode}
+                onChange={updateField}
+              />
+              <Input
+                label="Subject Name:"
+                name="subjectName"
+                value={formData.subjectName}
+                onChange={updateField}
+              />
 
               {/* upload section */}
               <div>
@@ -131,14 +143,25 @@ const UpdateSubject = ({ onClose, onSubmit, initialData = {} }) => {
               {/* buttons */}
               <div className="flex flex-col items-center gap-4">
                 <div className="flex gap-4">
-                  <button type="button" onClick={saveChanges} className="rounded bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700">
+                  <button
+                    type="button"
+                    onClick={saveChanges}
+                    className="rounded bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
+                  >
                     Save changes
                   </button>
-                  <button type="button" onClick={onClose} className="rounded border border-gray-400 bg-white px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                  <button
+                    type="button"
+                    onClick={onClose}
+                    className="rounded border border-gray-400 bg-white px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                  >
                     Cancel
                   </button>
                 </div>
-                <button type="submit" className="rounded-full bg-blue-600 px-8 py-2 font-medium text-white hover:bg-blue-700">
+                <button
+                  type="submit"
+                  className="rounded-full bg-blue-600 px-8 py-2 font-medium text-white hover:bg-blue-700"
+                >
                   Submit
                 </button>
               </div>
@@ -177,9 +200,8 @@ UpdateSubject.propTypes = {
   initialData: PropTypes.shape({
     courseCode:    PropTypes.string,
     subjectCode:   PropTypes.string,
-    newLevel:      PropTypes.string,
-    newCourseName: PropTypes.string,
-    subjectName:   PropTypes.string,
+    // removed: newLevel, newCourseName
+    subjectName:   PropTypes.string, // ignored for initial fill on purpose
     files:         PropTypes.array,
   }),
 };

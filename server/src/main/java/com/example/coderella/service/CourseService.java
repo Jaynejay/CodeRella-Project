@@ -1,3 +1,4 @@
+// src/main/java/com/example/coderella/service/CourseService.java
 package com.example.coderella.service;
 
 import com.example.coderella.dto.CourseDto;
@@ -6,8 +7,9 @@ import com.example.coderella.repository.CourseRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import java.util.List;
+
 import java.io.IOException;
+import java.util.List;
 
 @Service
 @Transactional
@@ -19,32 +21,50 @@ public class CourseService {
     }
 
     public Course createCourse(CourseDto dto) throws IOException {
+        // ───── Duplicate Check ─────
+        if (repo.findBySNo(dto.getSNo()).isPresent()) {
+            throw new IllegalArgumentException("Duplicate entry: Course with sNo " + dto.getSNo() + " already exists.");
+        }
+
+        if (repo.findByCode(dto.getCode()).isPresent()) {
+            throw new IllegalArgumentException("Duplicate entry: Course with code " + dto.getCode() + " already exists.");
+        }
+
+
+        // ───── Save Course ─────
         Course c = new Course();
         c.setSNo(dto.getSNo());
         c.setCode(dto.getCode());
         c.setTitle(dto.getTitle());
         c.setLevel(dto.getLevel());
+        c.setName(dto.getName());
+
         if (dto.getImage() != null && !dto.getImage().isEmpty()) {
             c.setImageData(dto.getImage().getBytes());
             c.setImageType(dto.getImage().getContentType());
         }
+
         return repo.save(c);
     }
 
-    public Course updateCourse(Long id, CourseDto dto) throws IOException {
-        Course c = repo.findBySNo(id)
-                .orElseThrow(() -> new EntityNotFoundException("Course not found: " + id));
-        // If you ever allow changing sNo itself, uncomment next line:
-        // c.setSNo(dto.getSNo());
+    public Course updateCourse(Long sNo, CourseDto dto) throws IOException {
+        Course c = repo.findBySNo(sNo)
+                .orElseThrow(() -> new EntityNotFoundException("Course not found: " + sNo));
+
+        c.setName(dto.getName());   // ✅ Add this line
         c.setCode(dto.getCode());
         c.setTitle(dto.getTitle());
         c.setLevel(dto.getLevel());
+
         if (dto.getImage() != null && !dto.getImage().isEmpty()) {
             c.setImageData(dto.getImage().getBytes());
             c.setImageType(dto.getImage().getContentType());
         }
+
         return repo.save(c);
     }
+
+
 
     @Transactional(readOnly = true)
     public Course getBySNo(Long sNo) {
@@ -53,14 +73,17 @@ public class CourseService {
     }
 
     public void deleteBySNo(Long sNo) {
-        if (!repo.findBySNo(sNo).isPresent()) {
-            throw new EntityNotFoundException("Course not found: " + sNo);
-        }
-        repo.deleteBySNo(sNo);
+        Course c = getBySNo(sNo);
+        repo.delete(c);
     }
 
     @Transactional(readOnly = true)
     public List<Course> listAll() {
         return repo.findAll();
+    }
+
+    @Transactional(readOnly = true)
+    public List<Course> findRecentCourses() {
+        return repo.findTop5ByOrderByCreatedAtDesc();
     }
 }

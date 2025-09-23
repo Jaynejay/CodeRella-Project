@@ -36,7 +36,7 @@ public class UserController {
             Authentication authentication
     ) {
         String username = authentication.getName();
-        User user = userRepository.findByUsername(username);
+        User user = userRepository.findByUsername(username).orElse(null);// I corected here by .orElse(null);;
 
         user.setFirstname(request.getFirstname());
         user.setLastname(request.getLastname());
@@ -67,7 +67,7 @@ public class UserController {
     @GetMapping("/me")
     public ResponseEntity<UserProfileResponse> getLoggedInUser(Authentication authentication) {
         String username = authentication.getName();
-        User user = userRepository.findByUsername(username);
+        User user = userRepository.findByUsername(username).orElse(null);// I corected here by .orElse(null);;// I corrected here by .orElse(null);;
 
         UserProfileResponse response = new UserProfileResponse(
                 user.getUsername(),
@@ -100,7 +100,7 @@ public class UserController {
             Authentication authentication
     ) {
         String username = authentication.getName();
-        User user = userRepository.findByUsername(username);
+        User user = userRepository.findByUsername(username).orElse(null);// I corected here by .orElse(null);;
 
         user.setFirstname(request.getFirstname());
         user.setLastname(request.getLastname());
@@ -133,7 +133,7 @@ public class UserController {
             Authentication authentication) {
         try {
             String username = authentication.getName();
-            User user = userRepository.findByUsername(username);
+            User user = userRepository.findByUsername(username).orElse(null);// I corected here by .orElse(null);
 
             user.setProfileImage(file.getBytes());
             userRepository.save(user);
@@ -151,7 +151,7 @@ public class UserController {
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<byte[]> getProfileImage(Authentication authentication) {
         String username = authentication.getName();
-        User user = userRepository.findByUsername(username);
+        User user = userRepository.findByUsername(username).orElse(null);// I corected here by .orElse(null);
 
         byte[] image = user.getProfileImage();
         if (image == null || image.length == 0) {

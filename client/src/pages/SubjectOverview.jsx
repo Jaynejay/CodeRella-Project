@@ -1,152 +1,238 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import axios from 'axios';
 
 import SideBarSubject from '../components/layout/SideBarSubject';
-import AddSubject from './AddSubject';
-import UpdateSubject from './UpdateSubject';
-import DeleteSubject from './DeleteSubject';
+import AddSubject     from './AddSubject';
+import UpdateSubject  from './UpdateSubject';
+import DeleteSubject  from './DeleteSubject';
 
-// Import initialCourses from CourseOverview
-import { initialCourses } from './CourseOverview';
+const baseUrl = 'http://localhost:8080/api';
 
-// Helper function to find the course by code
-const getCourseTitleByCode = (code) => {
-  const course = initialCourses.find((c) => c.code === code);
-  return course ? course.title : 'Unknown Course';
-};
-
-const subjectData = {
-  'A01S003F4.3': [
-    { code: 'FAS101', title: 'Soil Fundamentals' },
-    { code: 'FAS102', title: 'Crop Protection 1' },
-    { code: 'FAS103', title: 'Irrigation Basics' },
-  ],
-  '3D15T001P5-1': [
-    { code: 'NDF201', title: 'Food Chemistry' },
-    { code: 'NDF202', title: 'Processing Equipment' },
-    { code: 'NDF203', title: 'Quality Assurance' },
-  ],
-};
-
-const SubjectOverview = () => {
-  const { code } = useParams();
+export default function SubjectOverview() {
+  const { sNo: courseId } = useParams();  // from route param /courses/:sNo
   const navigate = useNavigate();
 
-  const [courseTitle, setCourseTitle] = useState(getCourseTitleByCode(code));
-  const [subjects, setSubjects] = useState(subjectData[code] ?? []);
+  const [courseTitle, setCourseTitle] = useState('');
+  const [courseLevel, setCourseLevel] = useState('');
+  const [courseCode,  setCourseCode]  = useState('');
+  const [subjects,    setSubjects]    = useState([]);
+  const [allSubjects, setAllSubjects] = useState([]);
 
-  const [showAdd, setShowAdd] = useState(false);
+  const [showAdd,    setShowAdd]    = useState(false);
   const [showUpdate, setShowUpdate] = useState(false);
   const [showDelete, setShowDelete] = useState(false);
-  const [selected, setSelected] = useState(null);
+  const [selected,   setSelected]   = useState(null);
+
+  // NEW: which subject's 3-dot menu is open (store subject code)
+  const [openMenuFor, setOpenMenuFor] = useState(null);
+
+  const fetchSubjects = useCallback(async () => {
+    if (!courseId) {
+      alert("Invalid course ID");
+      return;
+    }
+
+    try {
+      const [courseRes, subjRes] = await Promise.all([
+        axios.get(`${baseUrl}/courses/${courseId}`),
+        axios.get(`${baseUrl}/courses/${courseId}/subjects`)
+      ]);
+      setCourseTitle(courseRes.data.title);
+      setCourseCode(courseRes.data.code);
+      setCourseLevel(courseRes.data.level);
+      setSubjects(subjRes.data);
+      setAllSubjects(subjRes.data);
+    } catch (err) {
+      console.error(err);
+      alert('Failed to load subjects');
+    }
+  }, [courseId]);
 
   useEffect(() => {
-    setCourseTitle(getCourseTitleByCode(code));
-    setSubjects(subjectData[code] ?? []);
-  }, [code]);
+    fetchSubjects();
+  }, [fetchSubjects]);
 
-  const openAdd = () => setShowAdd(true);
-  const openUpdate = (s) => { setSelected(s); setShowUpdate(true); };
-  const openDelete = (s) => { setSelected(s); setShowDelete(true); };
+  const handleSearch = (e) => {
+    const keyword = e.target.value.toLowerCase();
+    setSubjects(allSubjects.filter((s) =>
+      (s.title || '').toLowerCase().includes(keyword) ||
+      (s.code || '').toLowerCase().includes(keyword)
+    ));
+  };
 
-  const handleAdd = ({ subjectCode, subjectName }) => {
-    setSubjects((p) => [...p, { code: subjectCode, title: subjectName }]);
+  const handleAdd = async ({ subjectCode, subjectName, files }) => {
+    const fd = new FormData();
+    fd.append('code', subjectCode);
+    fd.append('title', subjectName);
+    if (files.length) fd.append('image', files[0]);
+
+    await axios.post(`${baseUrl}/courses/${courseId}/subjects`, fd, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    });
+
+    fetchSubjects();
     setShowAdd(false);
   };
 
-  const handleUpd = ({ subjectCode, subjectName }) => {
-    setSubjects((p) =>
-      p.map((x) => (x.code === subjectCode ? { ...x, title: subjectName } : x))
+  const handleUpd = async (form) => {
+    const fd = new FormData();
+    fd.append('title', form.subjectName);
+    if (form.files.length) fd.append('image', form.files[0]);
+
+    await axios.put(
+      `${baseUrl}/courses/${courseId}/subjects/${form.subjectCode}`,
+      fd,
+      { headers: { 'Content-Type': 'multipart/form-data' } }
     );
+
+    fetchSubjects();
     setShowUpdate(false);
   };
 
-  const handleDel = ({ subjectCode }) => {
-    setSubjects((p) => p.filter((x) => x.code !== subjectCode));
-    setShowDelete(false);
+  const handleDel = async ({ subjectCode }) => {
+    try {
+      const code = encodeURIComponent(String(subjectCode).trim());
+      await axios.delete(`${baseUrl}/courses/${courseId}/subjects/${code}`);
+      await fetchSubjects(); // 204 No Content on success
+      setShowDelete(false);
+    } catch (err) {
+      console.error("Delete failed:", err?.response || err);
+      alert(
+        err?.response?.data?.message ||
+        err?.message ||
+        "Delete failed. Check the browser Network tab and server logs."
+      );
+    }
   };
+
+  // Close the menu when clicking outside or pressing ESC
+  useEffect(() => {
+    const onDocClick = (e) => {
+      // If click isn't inside any action area, close
+      if (!e.target.closest('[data-action-area="true"]')) {
+        setOpenMenuFor(null);
+      }
+    };
+    const onEsc = (e) => {
+      if (e.key === 'Escape') setOpenMenuFor(null);
+    };
+    document.addEventListener('click', onDocClick);
+    document.addEventListener('keydown', onEsc);
+    return () => {
+      document.removeEventListener('click', onDocClick);
+      document.removeEventListener('keydown', onEsc);
+    };
+  }, []);
 
   return (
     <>
       <div className="flex min-h-screen bg-gray-50 pt-24">
         <SideBarSubject title="My Subject" />
-
         <main className="flex-1 px-6">
           <section className="mx-auto max-w-5xl">
             <h1 className="mb-4 text-2xl font-semibold">Subject Overview</h1>
             <p className="mb-8 font-medium text-blue-900">
-              {code} – {courseTitle}
+              {courseCode} – {courseTitle || '…'}
             </p>
 
+            {/* Top bar */}
             <div className="mb-6 flex items-center justify-between">
               <div className="relative w-64">
-                <svg
-                  className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-blue-900"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  strokeWidth={2}
-                >
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-4.35-4.35M10 17a7 7 0 100-14 7 7 0 000 14z" />
-                </svg>
+                <label htmlFor="subjectSearch" className="sr-only">Search subject</label>
                 <input
+                  id="subjectSearch"
+                  name="subjectSearch"
+                  aria-label="Search subject"
                   type="text"
                   placeholder="Search subject"
                   className="w-full rounded-full bg-gray-200/60 pl-10 pr-4 py-2 text-sm focus:outline-none"
+                  onChange={handleSearch}
                 />
+                <svg className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-blue-900"
+                     xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                     stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round"
+                        d="M21 21l-4.35-4.35M10 17a7 7 0 100-14 7 7 0 000 14z" />
+                </svg>
               </div>
 
               <button
-                onClick={openAdd}
+                onClick={() => setShowAdd(true)}
                 className="rounded-full bg-[#0B1F7F] px-6 py-2 text-sm font-semibold text-white hover:bg-[#11299f]"
               >
                 Add subject
               </button>
             </div>
 
+            {/* Subject list */}
             <div className="rounded-xl bg-white p-6 shadow-inner ring-1 ring-gray-200 max-h-[60vh] overflow-y-auto">
               {subjects.map((s, idx) => (
                 <div
                   key={s.code}
-                  className="group mb-3 flex items-center justify-between rounded-full bg-blue-100 px-4 py-3 last:mb-0 hover:bg-blue-200"
-                  onClick={() => navigate(`/subjects/${s.code}`)}
+                  onClick={() => s.code && navigate(`/subject/${s.code}`)}
+                  className="mb-3 flex items-center justify-between rounded-full bg-blue-100 px-4 py-3 last:mb-0 hover:bg-blue-200 cursor-pointer"
                 >
                   <div className="flex items-center gap-6">
                     <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-gray-200 text-xs text-gray-700">
                       {idx + 1}
                     </span>
-                    <span className="w-20 truncate text-sm font-bold">{s.code}</span>
-                    <span className="truncate text-sm">{s.title}</span>
+                    <span className="text-sm font-bold">{s.code}</span>
+                    <span className="text-sm">{s.title}</span>
                   </div>
 
-                  <div className="relative shrink-0" onClick={(e) => e.stopPropagation()}>
-                    <button className="rounded-full p-1 hover:bg-blue-300/40">
-                      <svg
-                        viewBox="0 0 20 20"
-                        className="h-5 w-5 fill-[#0B1F7F]"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
+                  {/* Actions (3-dot button + controlled menu) */}
+                  <div
+                    className="relative shrink-0"
+                    data-action-area="true"
+                    onClick={(e) => e.stopPropagation()} // prevent row navigation when clicking button/menu
+                  >
+                    <button
+                      type="button"
+                      aria-haspopup="menu"
+                      aria-expanded={openMenuFor === s.code}
+                      aria-label={`Actions for ${s.code}`}
+                      className="rounded-full p-1 hover:bg-blue-300/40"
+                      onClick={() =>
+                        setOpenMenuFor((prev) => (prev === s.code ? null : s.code))
+                      }
+                    >
+                      <svg viewBox="0 0 20 20" className="h-5 w-5 fill-[#0B1F7F]">
                         <circle cx="10" cy="4" r="1.5" />
                         <circle cx="10" cy="10" r="1.5" />
                         <circle cx="10" cy="16" r="1.5" />
                       </svg>
                     </button>
 
-                    <div className="absolute right-0 top-8 z-10 hidden min-w-[140px] rounded-md bg-white py-1 text-sm shadow-lg group-hover:block">
-                      <button
-                        onClick={() => openDelete(s)}
-                        className="block w-full px-4 py-2 text-left hover:bg-gray-100"
+                    {openMenuFor === s.code && (
+                      <div
+                        role="menu"
+                        className="absolute right-0 top-8 z-10 min-w-[160px] rounded-md bg-white py-1 text-sm shadow-lg ring-1 ring-black/5"
                       >
-                        Delete subject
-                      </button>
-                      <button
-                        onClick={() => openUpdate(s)}
-                        className="block w-full px-4 py-2 text-left hover:bg-gray-100"
-                      >
-                        Update subject
-                      </button>
-                    </div>
+                        <button
+                          role="menuitem"
+                          onClick={() => {
+                            setSelected(s);
+                            setShowDelete(true);
+                            setOpenMenuFor(null);
+                          }}
+                          className="block w-full px-4 py-2 text-left hover:bg-gray-100"
+                        >
+                          Delete subject
+                        </button>
+                        <button
+                          role="menuitem"
+                          onClick={() => {
+                            setSelected(s);
+                            setShowUpdate(true);
+                            setOpenMenuFor(null);
+                          }}
+                          className="block w-full px-4 py-2 text-left hover:bg-gray-100"
+                        >
+                          Update subject
+                        </button>
+                      </div>
+                    )}
                   </div>
                 </div>
               ))}
@@ -155,35 +241,44 @@ const SubjectOverview = () => {
         </main>
       </div>
 
-      {showAdd && <AddSubject onClose={() => setShowAdd(false)} onSubmit={handleAdd} />}
+      {/* Modals */}
+      {showAdd && (
+        <AddSubject
+          onClose={() => setShowAdd(false)}
+          onSubmit={handleAdd}
+          initialCourseLevel={courseLevel}
+          initialCourseName={courseTitle}
+          initialCourseCode={courseCode}
+        />
+      )}
+
       {showUpdate && selected && (
         <UpdateSubject
           onClose={() => setShowUpdate(false)}
           onSubmit={handleUpd}
           initialData={{
-            courseCode: code,
+            courseCode: courseId,
             subjectCode: selected.code,
             subjectName: selected.title,
             newLevel: '',
-            newCourseName: '',
-            files: [],
+            newCourseName: '',https://github.com/Jaynejay/CodeRella-Project/pull/24/conflict?name=client%252Fsrc%252Fpages%252FSubjectOverview.jsx&ancestor_oid=1280545a26c54a3b5ebb1fd26cbc89877d09b7bc&base_oid=7136c731f022c6910e5a737d195440de2676c168&head_oid=9dc1a79503549e3a31d64f8c3ae8106769c4f963
+            files: []
           }}
         />
       )}
+
       {showDelete && selected && (
         <DeleteSubject
           isOpen={true}
           onClose={() => setShowDelete(false)}
           onDelete={handleDel}
           initialData={{
-            courseCode: code,
+            courseCode: courseId,
             subjectCode: selected.code,
-            subjectName: selected.title,
+            subjectName: selected.title
           }}
         />
       )}
     </>
   );
-};
-
-export default SubjectOverview;
+}

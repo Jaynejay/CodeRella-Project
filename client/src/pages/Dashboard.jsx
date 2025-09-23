@@ -1,60 +1,54 @@
-import { useState, useEffect } from "react";
-import axios from "axios";
-import { Link } from "react-router-dom";
+import { useState, useEffect } from 'react'
+import axios from 'axios'
+import { Link } from 'react-router-dom'
 
-import NavbarCourse from "../components/layout/NavbarCourse";
-import Footer from "../components/layout/Footer";
-import Calendar from "../components/layout/Calendar";
-import Deadline from "../pages/DeadlineAdmin";
+import NavbarCourse from '../components/layout/NavbarCourse'
+import Footer       from '../components/layout/Footer'
+import Calendar     from '../components/layout/Calendar'
+import Deadline     from '../pages/DeadlineAdmin'
 
-import { Clock, Calendar as CalendarIcon, BookOpen } from "lucide-react";
+import { Clock, Calendar as CalendarIcon, BookOpen } from 'lucide-react'
 
 export default function Dashboard() {
-  const managerId = localStorage.getItem("managerId");
+  const managerId = localStorage.getItem('managerId')
 
-  const [recentSubjects, setRecentSubjects] = useState([]);
-  const [events, setEvents] = useState([]);
-  const [announcements, setAnnouncements] = useState([]);
-  const [psNotifications, setPSNotifications] = useState([]);
-  const [selectedEvent, setSelectedEvent] = useState(null);
-  const [showDeadline, setShowDeadline] = useState(false);
+  const [recentSubjects,  setRecentSubjects]  = useState([])
+  const [events,          setEvents]          = useState([])
+  const [announcements,   setAnnouncements]   = useState([])
+  const [psNotifications, setPSNotifications] = useState([])
+  const [selectedEvent,   setSelectedEvent]   = useState(null)
+  const [showDeadline,    setShowDeadline]    = useState(false)
 
   useEffect(() => {
-    const base = "http://localhost:8080/api";
+    const base = 'http://localhost:8080/api'
 
-    axios
-      .get(`${base}/recent-subjects`)
-      .then((res) => setRecentSubjects(res.data))
-      .catch(console.error);
+    axios.get(`${base}/recent-subjects`)
+      .then(res => setRecentSubjects(res.data))
+      .catch(console.error)
 
-    axios
-      .get(`${base}/events?managerId=${managerId}`)
-      .then((res) => {
-        setEvents(
-          res.data.map((e) => ({
-            date: e.eventDate || e.date,
-            label: e.label,
-            subject: e.subject,
-          }))
-        );
+    axios.get(`${base}/events?managerId=${managerId}`)
+      .then(res => {
+        setEvents(res.data.map(e => ({
+          date:    e.eventDate || e.date,
+          label:   e.label,
+          subject: e.subject
+        })))
       })
-      .catch(console.error);
+      .catch(console.error)
 
-    axios
-      .get(`${base}/announcements`)
-      .then((res) => setAnnouncements(res.data))
-      .catch(console.error);
+    axios.get(`${base}/announcements`)
+      .then(res => setAnnouncements(res.data))
+      .catch(console.error)
 
-    axios
-      .get(`${base}/papersetter/announcements?paperSetterId=${managerId}`)
-      .then((res) => setPSNotifications(res.data))
-      .catch(console.error);
-  }, [managerId]);
+    axios.get(`${base}/papersetter/announcements?paperSetterId=${managerId}`)
+      .then(res => setPSNotifications(res.data))
+      .catch(console.error)
+  }, [managerId])
 
-  const handleEventClick = (e) => {
-    setSelectedEvent(e);
-    setShowDeadline(true);
-  };
+  const handleEventClick = e => {
+    setSelectedEvent(e)
+    setShowDeadline(true)
+  }
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -63,12 +57,11 @@ export default function Dashboard() {
       <main className="flex-1 bg-gray-50 pt-32 pb-8">
         <div className="mx-auto w-full max-w-7xl px-4">
           <div className="rounded-lg bg-white p-6 shadow">
+
             {/* ✅ Recently accessed subjects */}
-            <h2 className="mb-4 text-lg font-semibold">
-              Recently accessed subjects
-            </h2>
+            <h2 className="mb-4 text-lg font-semibold">Recently accessed subjects</h2>
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 mb-8">
-              {recentSubjects.map((s) => (
+              {recentSubjects.map(s => (
                 <Link
                   key={s.code}
                   to={`/subjects/${s.code}`}
@@ -106,16 +99,13 @@ export default function Dashboard() {
             <section className="mb-8">
               <h2 className="mb-2 text-lg font-semibold">Your announcements</h2>
               <ul className="divide-y text-sm">
-                {announcements.map((a) => (
+                {announcements.map(a => (
                   <li key={a.id} className="py-2">
                     <strong>{a.title}</strong>: {a.message}
                   </li>
                 ))}
               </ul>
-              <Link
-                to="/announcements"
-                className="mt-2 inline-block text-blue-600"
-              >
+              <Link to="/announcements" className="mt-2 inline-block text-blue-600">
                 Older Announcements…
               </Link>
             </section>
@@ -124,13 +114,14 @@ export default function Dashboard() {
             <section>
               <h2 className="mb-2 text-lg font-semibold">Notifications</h2>
               <ul className="divide-y text-sm">
-                {psNotifications.map((n) => (
+                {psNotifications.map(n => (
                   <li key={n.id} className="py-2">
                     <strong>{n.subject}</strong>: {n.message}
                   </li>
                 ))}
               </ul>
             </section>
+
           </div>
         </div>
       </main>
@@ -155,5 +146,5 @@ export default function Dashboard() {
         </div>
       )}
     </div>
-  );
+  )
 }

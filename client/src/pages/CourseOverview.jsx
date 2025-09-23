@@ -1,209 +1,253 @@
-// src/pages/CourseOverview.jsx
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import { Search } from "lucide-react";
 
-import CourseSidebar from '../components/layout/CourseSidebar';
-import AddingCourse  from './AddingCourse';
-import UpdateCourse  from './UpdateCourse';
-import DeleteCourse  from './DeleteCourse';
-
-import addPlus from '../assets/images/Addcourseplus.svg';
-import Agricul from '../assets/images/Agriculturalproduction.svg';
-import Field  from '../assets/images/FieldAssist.svg';
-import Food from '../assets/images/FoodTechnology.svg';
-import Motor from '../assets/images/Motorcycle.svg';
-import Planttissue from '../assets/images/Planttissuelab.svg';
-
-export const initialCourses = [
-  {
-    id: 1,
-    code: 'A01S003F4.3',
-    level: 'NVQ 4',
-    title: 'Field Assistant (Agriculture)',
-    img:Field ,
-  },
-  {
-    id: 2,
-    code: '45AQ1T003F6.1',
-    level: 'NVQ 6',
-    title: 'Higher National Diploma in Agricultural Production Technology',
-    img: Agricul,
-  },
-  {
-    id: 3,
-    code: 'G50S006F3.3',
-    level: 'NVQ 3',
-    title: 'Motircycle Mechanic',
-    img: Motor,
-  },
-  {
-    id: 4,
-    code: '3D15T001P5-1',
-    level: 'NVQ 5',
-    title: 'National Diploma in Food Technology',
-    img: Food,
-  },
-  {
-    id: 5,
-    code: 'A01S018F4.0',
-    level: 'NVQ 4',
-    title: 'Plant Tissue Culture Laboratory Assistant',
-    img: Planttissue,
-  },
-
-
-];
+import CourseSidebar from "../components/layout/CourseSidebar";
+import AddingCourse from "./AddingCourse";
+import UpdateCourse from "./UpdateCourse";
+import DeleteCourse from "./DeleteCourse";
+import addPlus from "../assets/images/Addcourseplus.svg";
 
 export default function CourseOverview() {
   const navigate = useNavigate();
+  const [searchTerm, setSearchTerm] = useState("");
+  const [category, setCategory] = useState("All");
+  const categories = ["All", "final", "5s1", "5s2", "5s3", "6s1", "6s2"];
 
-  /** ---------- local state ---------- */
-  const [courses, setCourses]         = useState(initialCourses);
-  const [showAdd, setShowAdd]         = useState(false);
-  const [menuOpen, setMenuOpen]       = useState(null);   // course-id that owns an open menu
-  const [editCourse, setEditCourse]   = useState(null);   // object → UpdateCourse modal
-  const [removeCourse, setRemoveCourse] = useState(null); // object → DeleteCourse modal
+  const [courses, setCourses] = useState([]);
+  const [showAdd, setShowAdd] = useState(false);
+  const [editCourse, setEditCourse] = useState(null);
+  const [remove, setRemove] = useState(null);
+  const [menuOpen, setMenuOpen] = useState(null);
+  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-  /** ---------- handlers ---------- */
-  const handleAddSubmit = (data) => {
-    const newCourse = {
-      id: Date.now(),
-      code : data.courseCode  || `CODE${courses.length + 1}`,
-      level: data.courseLevel || 'NVQ 4',
-      title: data.courseName  || 'Untitled Course',
-      img  : URL.createObjectURL(data.courseImage),
-    };
-    setCourses(prev => [...prev, newCourse]);
+  useEffect(() => {
+    axios
+      .get("http://localhost:8080/api/courses")
+      .then((res) => {
+        console.log("Fetched courses:", res.data);
+        res.data.forEach(c => {
+          if (!c.sNo) console.warn("⚠️ Course missing sNo:", c);
+        });
+        setCourses(res.data);
+      })
+      .catch(() => setError("Failed to load courses"))
+      .finally(() => setLoading(false));
+  }, []);
+
+  const filtered = courses
+    .filter((c) =>
+      c.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      c.code.toLowerCase().includes(searchTerm.toLowerCase())
+    )
+    .filter((c) => category === "All" || c.level === category);
+
+  const handleAdd = async (data) => {
+  const form = new FormData();
+  form.append("sNo", data.sNo);
+  form.append("code", data.code);       // match backend
+  form.append("name", data.name);   
+  form.append("title", data.title);    // NEW field
+  form.append("level", data.level);
+  if (data.imageFile) {
+    form.append("image", data.imageFile);
+  }
+
+  try {
+    const res = await axios.post("http://localhost:8080/api/courses", form);
+    setCourses((prev) => [...prev, res.data]);
+  } catch {
+    setError("Failed to add course");
+  } finally {
     setShowAdd(false);
+  }
+};
+
+
+  const handleUpdate = async (sNo, data) => {
+  const form = new FormData();
+  form.append("code", data.code);
+  form.append("name", data.name);
+  form.append("title", data.title); // ✅ important line to fix the issue
+  form.append("level", data.level);
+  if (data.imageFile) {
+    form.append("image", data.imageFile);
+  }
+
+  try {
+    const res = await axios.put(`http://localhost:8080/api/courses/${sNo}`, form);
+    setCourses((prev) =>
+      prev.map((c) => (c.sNo === sNo ? res.data : c))
+    );
+  } catch {
+    setError("Failed to update course");
+  } finally {
+    setEditCourse(null);
+  }
+};
+
+
+
+  const handleDelete = async (sNo) => {
+    try {
+      await axios.delete(`http://localhost:8080/api/courses/${sNo}`);
+      setCourses((prev) => prev.filter((c) => c.sNo !== sNo));
+    } catch {
+      setError("Failed to delete course");
+    } finally {
+      setRemove(null);
+    }
   };
 
-  const handleDelete = (id) => {
-    setCourses(prev => prev.filter(c => c.id !== id));
-    setRemoveCourse(null);
-  };
+  if (loading) return <div className="p-6">Loading…</div>;
+  if (error) return <div className="p-6 text-red-600">{error}</div>;
 
   return (
     <div className="flex h-screen overflow-hidden">
-      {/* sidebar */}
       <CourseSidebar />
-
-      {/* ---------- main column ---------- */}
       <main className="flex-1 overflow-y-auto bg-gray-100">
-        {/* centred panel */}
-        <div className="mx-auto mt-24 w-[90%] max-w-6xl rounded-xl bg-white p-6 pb-12 shadow  max-h-[calc(100vh-8rem)] overflow-y-auto">
-          {/* search row (still visual only) */}
-          <div className="mb-6 flex items-center justify-between">
-            <div className="relative w-60">
-              <input
-                type="text"
-                placeholder="Search Course"
-                className="w-full rounded-full border border-gray-300 py-2 pl-10 pr-4 text-sm
-                           focus:border-blue-500 focus:outline-none"
-              />
-              <span className="material-icons-outlined pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
-                search
-              </span>
+        <div className="mx-auto mt-24 w-[90%] max-w-6xl rounded-xl bg-white p-6 shadow">
+          {/* Header */}
+          <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <h1 className="text-2xl font-semibold">Courses</h1>
+            <div className="flex flex-1 items-center gap-3">
+              <div className="flex items-center bg-gray-100 rounded-full px-4 py-2 flex-1">
+                <Search size={16} className="text-gray-500 mr-2" />
+                <input
+                  type="text"
+                  placeholder="Search courses…"
+                  className="bg-transparent border-none focus:outline-none flex-1 text-sm"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
+              </div>
+              <select
+                value={category}
+                onChange={(e) => setCategory(e.target.value)}
+                className="bg-gray-100 rounded-full px-4 py-2 text-sm focus:outline-none"
+              >
+                {categories.map((cat) => (
+                  <option key={cat} value={cat}>
+                    {cat}
+                  </option>
+                ))}
+              </select>
             </div>
           </div>
 
-          {/* ---------- card grid ---------- */}
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {/* add-course tile */}
-            <button
+            {/* Add card */}
+            <div
+              key="add-course"
               onClick={() => setShowAdd(true)}
-              className="flex h-60 w-full flex-col items-center justify-center rounded-lg border-2
-                         border-dashed border-gray-300 text-gray-600 hover:border-blue-500 hover:bg-blue-50  bg-blue-100"
+              className="cursor-pointer flex flex-col items-center justify-center gap-2 rounded-lg border border-gray-200 bg-gray-50 p-6 hover:shadow-md"
             >
-              <img src={addPlus} alt="Add course" className="mb-3 h-16 w-16 select-none pointer-events-none" />
-              <span className="text-lg font-medium">Add Course</span>
-            </button>
+              <img src={addPlus} alt="Add Course" className="h-12 w-12" />
+              <span className="text-sm font-medium">Add Course</span>
+            </div>
 
-            {courses.map((c) => (
+            {/* Course cards */}
+            {filtered.map((c) => (
               <div
-                key={c.id}
-                className="group relative h-60 cursor-pointer overflow-hidden rounded-lg bg-white shadow
-                           hover:shadow-md"
-                onClick={() => navigate(`/courses/${c.code}`)}
+                key={c.sNo || c.id}
+                className="relative h-60 overflow-hidden rounded-lg bg-white shadow hover:shadow-md"
               >
-                <img src={c.img} alt={c.title} className="h-32 w-full object-cover" />
-
-                <div className="p-3">
-                  <span className="mb-1 inline-block rounded-full bg-indigo-700 px-2 py-0.5 text-xs font-semibold text-white">
-                    {c.level}
-                  </span>
-                  <h3 className="line-clamp-2 text-sm font-medium">{c.title}</h3>
-                  <p className="text-xs text-gray-500">{c.code}</p>
-                </div>
-
-                {/* three-dot menu */}
                 <div
-                  className="absolute right-1.5 top-1.5 rounded-full   bg-white p-1
-+             ring-1 ring-gray-300 hover:bg-blue-100"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setMenuOpen(menuOpen === c.id ? null : c.id);
+                  role="button"
+                  className="h-2/3 relative cursor-pointer"
+                  onClick={() => {
+                    console.log("Clicked course:", c);
+                    if (c.sNo) {
+                      navigate(`/courses/${c.sNo}`);
+                    } else {
+                      alert("Error: Course serial number (sNo) is missing.");
+                    }
                   }}
                 >
-                  <span className="material-icons-outlined text-gray-500">more_vert</span>
+                  {c.imageData ? (
+                    <img
+                      src={`data:${c.imageType};base64,${c.imageData}`}
+                      alt={c.title}
+                      className="h-full w-full object-cover"
+                    />
+                  ) : (
+                    <div className="h-full w-full bg-gray-200 flex items-center justify-center text-gray-500">
+                      No image
+                    </div>
+                  )}
+                  <span className="absolute top-2 right-2 bg-blue-800 px-2 py-0.5 text-xs font-semibold text-white rounded">
+                    {c.level}
+                  </span>
                 </div>
 
-                {/* dropdown */}
-                {menuOpen === c.id && (
-                  <div
-                    className="absolute right-2 top-9 z-20 w-32 rounded-md border border-gray-100 bg-white
-                               py-1 text-sm shadow-lg"
-                    onClick={(e) => e.stopPropagation()}
-                  >
-                    <button
-                      className="flex w-full items-center px-4 py-2 hover:bg-gray-100"
-                      onClick={() => {
-                        setEditCourse(c);
-                        setMenuOpen(null);
-                      }}
-                    >
-                      Update course
-                    </button>
-                    <button
-                      className="flex w-full items-center px-4 py-2 text-red-600 hover:bg-gray-100"
-                      onClick={() => {
-                        setRemoveCourse(c);
-                        setMenuOpen(null);
-                      }}
-                    >
-                      Delete course
-                    </button>
+                <div className="p-3 flex flex-col justify-between h-1/3">
+                  <div>
+                    <p className="text-xs text-gray-500 truncate">{c.code}</p>
+                    <h3 className="text-sm font-medium truncate">{c.name}</h3>
                   </div>
-                )}
+                  <div className="relative">
+                    <button
+                      onClick={() =>
+                        setMenuOpen(menuOpen === c.sNo ? null : c.sNo)
+                      }
+                      className="absolute bottom-0 right-0 p-1"
+                    >
+                      ⋮
+                    </button>
+                    {menuOpen === c.sNo && (
+                      <div className="absolute bottom-6 right-0 z-10 w-36 rounded-md bg-white shadow-lg">
+                        <button
+                          onClick={() => {
+                            setEditCourse(c);
+                            setMenuOpen(null);
+                          }}
+                          className="block w-full px-4 py-2 text-left text-sm hover:bg-gray-100"
+                        >
+                          Edit course
+                        </button>
+                        {/* <button
+                          onClick={() => {
+                            setRemove(c);
+                            setMenuOpen(null);
+                          }}
+                          className="block w-full px-4 py-2 text-left text-sm hover:bg-gray-100"
+                        >
+                          Delete course
+                        </button> */}
+                      </div>
+                    )}
+                  </div>
+                </div>
               </div>
             ))}
           </div>
         </div>
       </main>
 
-      {/* ---------- modals ---------- */}
+      {/* Modals */}
       {showAdd && (
         <AddingCourse
           isOpen
           onClose={() => setShowAdd(false)}
-          onSubmit={handleAddSubmit}
+          onSubmit={handleAdd}
         />
       )}
-
       {editCourse && (
         <UpdateCourse
-          course={editCourse}
           isOpen
+          course={editCourse}
           onClose={() => setEditCourse(null)}
-          // onSubmit={…}   ← plug in when you wire the backend
+          onSubmit={(data) => handleUpdate(editCourse.sNo, data)}
         />
       )}
-
-      {removeCourse && (
+      {remove && (
         <DeleteCourse
-          course={removeCourse}
           isOpen
-          onClose={() => setRemoveCourse(null)}
-          onConfirm={() => handleDelete(removeCourse.id)}
+          course={remove}
+          onClose={() => setRemove(null)}
+          onDelete={() => handleDelete(remove.sNo)}
         />
       )}
     </div>

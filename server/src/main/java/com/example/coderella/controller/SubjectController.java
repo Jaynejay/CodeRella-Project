@@ -1,61 +1,73 @@
+// File: src/main/java/com/example/coderella/controller/SubjectController.java
 package com.example.coderella.controller;
 
 import com.example.coderella.dto.SubjectDto;
 import com.example.coderella.entity.Subject;
 import com.example.coderella.service.SubjectService;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/courses/{sNo}/subjects")
-@CrossOrigin(origins = "http://localhost:5173")
+@CrossOrigin(origins = "http://localhost:5174") // or * for all
 public class SubjectController {
 
     private final SubjectService service;
+
     public SubjectController(SubjectService service) {
         this.service = service;
     }
 
-    @GetMapping
+    // ========== SUBJECTS BY COURSE ==========
+    @GetMapping("/api/courses/{sNo}/subjects")
     public List<Subject> listByCourse(@PathVariable Long sNo) {
         return service.listByCourse(sNo);
     }
 
-    @PostMapping
+    @PostMapping(value = "/api/courses/{sNo}/subjects", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Subject> create(
             @PathVariable Long sNo,
-            @RequestBody SubjectDto dto
+            @ModelAttribute SubjectDto dto
     ) {
-        Subject created = service.create(sNo, dto);
-        return ResponseEntity.status(HttpStatus.CREATED).body(created);
+        try {
+            Subject created = service.create(sNo, dto);
+            return ResponseEntity.status(HttpStatus.CREATED).body(created);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
-    @GetMapping("/{subjectCode}")
+    @GetMapping("/api/courses/{sNo}/subjects/{subjectCode}")
     public ResponseEntity<Subject> getOne(
             @PathVariable Long sNo,
             @PathVariable String subjectCode
     ) {
-        return ResponseEntity.ok(service.getByCode(sNo, subjectCode));
+        return ResponseEntity.ok(service.getOne(sNo, subjectCode));
     }
 
-    @PutMapping("/{subjectCode}")
+    @PutMapping(value = "/api/courses/{sNo}/subjects/{subjectCode}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Subject> update(
             @PathVariable Long sNo,
             @PathVariable String subjectCode,
-            @RequestBody SubjectDto dto
+            @ModelAttribute SubjectDto dto
     ) {
         return ResponseEntity.ok(service.update(sNo, subjectCode, dto));
     }
 
-    @DeleteMapping("/{subjectCode}")
+    @DeleteMapping("/api/courses/{sNo}/subjects/{subjectCode}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(
             @PathVariable Long sNo,
             @PathVariable String subjectCode
     ) {
         service.delete(sNo, subjectCode);
+    }
+
+    // ========== SUBJECTS BY PAPER SETTER ==========
+    @GetMapping("/api/subjects/assigned-to/{registrationId}")
+    public ResponseEntity<List<Subject>> getSubjectsAssignedToPaperSetter(@PathVariable String registrationId) {
+        return ResponseEntity.ok(service.getSubjectsByPaperSetter(registrationId));
     }
 }

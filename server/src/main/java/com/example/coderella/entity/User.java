@@ -19,6 +19,13 @@ import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
 import lombok.Data;
 
+import jakarta.persistence.*;
+import lombok.*;
+
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Data
 @Table(name = "users")
@@ -30,12 +37,13 @@ public class User {
 
     private String registrationId;
 
-    @Column(unique = true)
+
+    @Column(nullable = false, unique = true) //I changed
     private String username;
 
-    @Column(unique = true)
+    @Column(unique = true) //I changed
     private String email;
-
+    @Column(nullable = false)  //I changed
     private String password;
 
     private String firstname;
@@ -62,7 +70,7 @@ public class User {
 
     private boolean isActive = false;
     private boolean isProfileCompleted = false;
-    
+
     @Column(nullable = false)
     private boolean firstLogin = false;
 
@@ -81,11 +89,11 @@ public class User {
 
     private String resetToken;
 
-    @ManyToMany
+    @ManyToMany  // papersetter subject assignments
     @JoinTable(
-        name = "subject_assignments",
-        joinColumns = @JoinColumn(name = "user_id"),
-        inverseJoinColumns = @JoinColumn(name = "subject_id")
+            name = "subject_assignments",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "subject_id")
     )
     private Set<PapersetterSubject> subjects;
 }
