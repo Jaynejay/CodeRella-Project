@@ -1,37 +1,60 @@
-import { useState } from 'react'
-import { Link } from 'react-router-dom'
-import NavbarCourse from '../components/layout/NavbarCourse'
-import Footer from '../components/layout/Footer'
-import Calendar from '../components/layout/Calendar'
-import Deadline from './DeadlineAdmin'
-import { Clock, Calendar as CalendarIcon, BookOpen } from 'lucide-react'
-import Agricul from '../assets/images/Agriculturalproduction.svg'
-import Field from '../assets/images/FieldAssist.svg'
-import Food from '../assets/images/FoodTechnology.svg'
-import Planttissue from '../assets/images/Planttissuelab.svg'
+import { useState, useEffect } from "react";
+import axios from "axios";
+import { Link } from "react-router-dom";
 
-/* ─ recentCourses (4 items) ─ */
-const recentCourses = [
-  { id: 'sub-01', title: 'Principles Of Plant Protection', level: 'NVQ 6', cover: Agricul },
-  { id: 'sub-02', title: 'Other Field Crop Production', level: 'NVQ 6', cover: Field },
-  { id: 'sub-03', title: 'Plantation & Export Agricultural Crop Production', level: 'NVQ 6', cover: Planttissue },
-  { id: 'sub-04', title: 'Intro to Organic Farming', level: 'NVQ 5', cover: Food },
-]
+import NavbarCourse from "../components/layout/NavbarCourse";
+import Footer from "../components/layout/Footer";
+import Calendar from "../components/layout/Calendar";
+import Deadline from "../pages/DeadlineAdmin";
 
-/* ─ latestAnnouncements (unchanged) ─ */
-const announcements = [
-  { id: 1, date: '10 December, 11:48', author: 'Admin user', body: 'Upgrade website' },
-  { id: 2, date: '7 January, 22:34', author: 'Admin user', body: 'Welcome to website' },
-]
+import { Clock, Calendar as CalendarIcon, BookOpen } from "lucide-react";
 
 export default function Dashboard() {
-  const [selectedEvent, setSelectedEvent] = useState(null)
-  const [showDeadline, setShowDeadline] = useState(false)
+  const managerId = localStorage.getItem("managerId");
 
-  const handleEventClick = (event) => {
-    setSelectedEvent(event)
-    setShowDeadline(true)
-  }
+  const [recentSubjects, setRecentSubjects] = useState([]);
+  const [events, setEvents] = useState([]);
+  const [announcements, setAnnouncements] = useState([]);
+  const [psNotifications, setPSNotifications] = useState([]);
+  const [selectedEvent, setSelectedEvent] = useState(null);
+  const [showDeadline, setShowDeadline] = useState(false);
+
+  useEffect(() => {
+    const base = "http://localhost:8080/api";
+
+    axios
+      .get(`${base}/recent-subjects`)
+      .then((res) => setRecentSubjects(res.data))
+      .catch(console.error);
+
+    axios
+      .get(`${base}/events?managerId=${managerId}`)
+      .then((res) => {
+        setEvents(
+          res.data.map((e) => ({
+            date: e.eventDate || e.date,
+            label: e.label,
+            subject: e.subject,
+          }))
+        );
+      })
+      .catch(console.error);
+
+    axios
+      .get(`${base}/announcements`)
+      .then((res) => setAnnouncements(res.data))
+      .catch(console.error);
+
+    axios
+      .get(`${base}/papersetter/announcements?paperSetterId=${managerId}`)
+      .then((res) => setPSNotifications(res.data))
+      .catch(console.error);
+  }, [managerId]);
+
+  const handleEventClick = (e) => {
+    setSelectedEvent(e);
+    setShowDeadline(true);
+  };
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -39,67 +62,74 @@ export default function Dashboard() {
 
       <main className="flex-1 bg-gray-50 pt-32 pb-8">
         <div className="mx-auto w-full max-w-7xl px-4">
-          <div className="rounded-lg border bg-white p-6 shadow">
-
-            {/* ─ Recently accessed subjects ─ */}
-            <h2 className="mb-4 text-lg font-semibold">Recently accessed subjects</h2>
-
-            <div className="grid gap-8 sm:grid-cols-3 lg:grid-cols-4 mb-8">
-              {recentCourses.map((c) => (
+          <div className="rounded-lg bg-white p-6 shadow">
+            {/* ✅ Recently accessed subjects */}
+            <h2 className="mb-4 text-lg font-semibold">
+              Recently accessed subjects
+            </h2>
+            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 mb-8">
+              {recentSubjects.map((s) => (
                 <Link
-                  to={`/adminsubject-detail/${c.id}`}
-                  key={c.id}
-                  className="overflow-hidden rounded-lg border hover:shadow w-full"
+                  key={s.code}
+                  to={`/subjects/${s.code}`}
+                  className="block overflow-hidden rounded-lg shadow hover:shadow-md border"
                 >
-                  <div className="relative aspect-square w-full">
-                    <img
-                      src={c.cover}
-                      alt={c.title}
-                      className="absolute inset-0 h-full w-full object-cover"
-                    />
-                    <span className="absolute top-1 left-1 rounded bg-blue-800 px-2 py-0.5 text-xs font-semibold text-white">
-                      {c.level}
+                  <div className="relative aspect-video">
+                    {s.coverPath ? (
+                      <img
+                        src={`http://localhost:8080/uploads/subject_covers/${s.coverPath}`}
+                        alt={s.title}
+                        className="w-full h-32 object-cover rounded-md"
+                      />
+                    ) : (
+                      <div className="w-full h-32 bg-gray-200 flex items-center justify-center text-gray-500">
+                        No Image
+                      </div>
+                    )}
+                    <span className="absolute top-2 left-2 bg-blue-800 text-white text-xs px-2 py-0.5 rounded">
+                      {s.level}
                     </span>
                   </div>
-                  <div className="p-3 text-base text-center truncate">
-                    {c.id} – {c.title}
+                  <div className="p-3 text-center text-sm font-medium">
+                    {s.code} – {s.title}
                   </div>
                 </Link>
               ))}
             </div>
 
-            {/* Calendar with assignments details */}
+            {/* Calendar */}
             <div className="mb-8">
-              <Calendar
-                events={[
-                  { date: '2025-05-31', label: 'Exam paper', subject: 'SUB-01-Principles Of Plant Protection' },
-                  { date: '2025-05-23', label: 'Exam paper', subject: 'SUB-02-Other Field Crop Production' },
-                ]}
-                onEventClick={handleEventClick}
-              />
+              <Calendar events={events} onEventClick={handleEventClick} />
             </div>
 
-            {/* ─ Latest announcements ─ */}
-            <section>
-              <h2 className="mb-2 text-lg font-semibold">Latest announcements</h2>
+            {/* Manager’s announcements */}
+            <section className="mb-8">
+              <h2 className="mb-2 text-lg font-semibold">Your announcements</h2>
               <ul className="divide-y text-sm">
                 {announcements.map((a) => (
-                  <li key={a.id}>
-                    <Link
-                      to={`/announcements/${a.id}`}
-                      state={{ announcement: a }}
-                      className="block py-2 hover:bg-gray-100"
-                    >
-                      <p className="text-gray-600">{a.date}</p>
-                      <p className="font-medium">{a.author}</p>
-                      <p>{a.body}</p>
-                    </Link>
+                  <li key={a.id} className="py-2">
+                    <strong>{a.title}</strong>: {a.message}
                   </li>
                 ))}
               </ul>
-              <Link to="/announcements" className="mt-2 inline-block text-blue-600">
+              <Link
+                to="/announcements"
+                className="mt-2 inline-block text-blue-600"
+              >
                 Older Announcements…
               </Link>
+            </section>
+
+            {/* Notifications you’ve received */}
+            <section>
+              <h2 className="mb-2 text-lg font-semibold">Notifications</h2>
+              <ul className="divide-y text-sm">
+                {psNotifications.map((n) => (
+                  <li key={n.id} className="py-2">
+                    <strong>{n.subject}</strong>: {n.message}
+                  </li>
+                ))}
+              </ul>
             </section>
           </div>
         </div>
@@ -125,5 +155,5 @@ export default function Dashboard() {
         </div>
       )}
     </div>
-  )
+  );
 }
